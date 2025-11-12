@@ -1,0 +1,72 @@
+{
+  "name": "snackmoney",
+  "version": "1.0.16",
+  "description": "CLI tool for sending USDC payments via Snack Money API using x402 protocol",
+  "type": "module",
+  "bin": {
+    "snackmoney": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "snackmoney",
+    "usdc",
+    "payments",
+    "crypto",
+    "x402",
+    "farcaster",
+    "twitter",
+    "solana",
+    "base",
+    "ethereum",
+    "cli"
+  ],
+  "author": "Snack Money",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snack-money/snackmoney-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/snack-money/snackmoney-cli/issues"
+  },
+  "homepage": "https://github.com/snack-money/snackmoney-cli#readme",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "pay": "tsx pay.ts",
+    "batch-pay": "tsx batch_pay.ts",
+    "ai-agent": "tsx ai-payment-agent.ts",
+    "format": "prettier -c .prettierrc --write \"**/*.{ts,js,cjs,json,md}\"",
+    "format:check": "prettier -c .prettierrc --check \"**/*.{ts,js,cjs,json,md}\"",
+    "lint": "eslint . --ext .ts --fix",
+    "lint:check": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "@coinbase/x402": "^0.7.1",
+    "axios": "^1.13.2",
+    "dotenv": "^16.5.0",
+    "minimist": "^1.2.8",
+    "viem": "^2.38.6",
+    "x402-axios": "^0.7.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^24.0.12",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "eslint": "^9.24.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsdoc": "^50.6.9",
+    "eslint-plugin-prettier": "^5.2.6",
+    "prettier": "3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}
