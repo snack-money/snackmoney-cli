@@ -265,17 +265,34 @@ let receiverIdentity: string;
 let receivers: Array<{receiver: string, amount: number}>;
 let useSolana: boolean;
 
+if (args.help || args.h) {
+  console.log("Usage: snackmoney batch-pay <input> [--network <base|solana>]");
+  console.log("\nInput formats:");
+  console.log("  1. Comma-separated: x/jessepollak:1¢,aeyakovenko:$0.5");
+  console.log("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"jessepollak\",\"amount\":\"1¢\"}]}'");
+  console.log("  3. File path: ./payments.json or file:./payments.json");
+  console.log("  4. HTTP URL: https://example.com/payments.json");
+  console.log("\nExamples:");
+  console.log("  snackmoney batch-pay x/jessepollak:1¢,aeyakovenko:$0.5");
+  console.log("  snackmoney batch-pay x.com/jessepollak:1¢,0xmesuthere:$0.5");
+  console.log("  snackmoney batch-pay twitter.com/jessepollak:1¢,aeyakovenko:$0.5");
+  console.log("  snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢");
+  console.log("  snackmoney batch-pay ./payments.json");
+  console.log("  snackmoney batch-pay https://example.com/payments.json");
+  process.exit(0);
+}
+
 if (args._.length === 0) {
   console.error("Usage: snackmoney batch-pay <input> [--network <base|solana>]");
   console.error("\nInput formats:");
-  console.error("  1. Comma-separated: x/user1:1¢,user2:$0.5");
-  console.error("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"user\",\"amount\":\"1¢\"}]}'");
+  console.error("  1. Comma-separated: x/jessepollak:1¢,aeyakovenko:$0.5");
+  console.error("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"jessepollak\",\"amount\":\"1¢\"}]}'");
   console.error("  3. File path: ./payments.json or file:./payments.json");
   console.error("  4. HTTP URL: https://example.com/payments.json");
   console.error("\nExamples:");
-  console.error("  snackmoney batch-pay x/user1:1¢,user2:$0.5");
-  console.error("  snackmoney batch-pay x.com/user1:1¢,user2:$0.5");
-  console.error("  snackmoney batch-pay twitter.com/user1:1¢,user2:$0.5");
+  console.error("  snackmoney batch-pay x/jessepollak:1¢,aeyakovenko:$0.5");
+  console.error("  snackmoney batch-pay x.com/jessepollak:1¢,0xmesuthere:$0.5");
+  console.error("  snackmoney batch-pay twitter.com/jessepollak:1¢,aeyakovenko:$0.5");
   console.error("  snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢");
   console.error("  snackmoney batch-pay ./payments.json");
   console.error("  snackmoney batch-pay https://example.com/payments.json");
@@ -321,8 +338,8 @@ async function parseInput(): Promise<void> {
     console.error(`❌ ${error.message}`);
     console.error("\nUsage: snackmoney batch-pay <input> [--network <base|solana>]");
     console.error("\nInput formats:");
-    console.error("  1. Comma-separated: x/user1:1¢,user2:$0.5");
-    console.error("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"user\",\"amount\":\"1¢\"}]}'");
+    console.error("  1. Comma-separated: x/jessepollak:1¢,aeyakovenko:$0.5");
+    console.error("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"jessepollak\",\"amount\":\"1¢\"}]}'");
     console.error("  3. File path: ./payments.json or file:./payments.json");
     console.error("  4. HTTP URL: https://example.com/payments.json");
     process.exit(1);

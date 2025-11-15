@@ -201,7 +201,7 @@ if (args._.length < 2) {
     "Usage: snackmoney pay <platform/user> <amount> [--network <base|solana>]",
   );
   console.error("\nExamples:");
-  console.error("  snackmoney pay x/aeyakovenko 1¢");
+  console.error("  snackmoney pay x/jessepollak 1¢");
   console.error("  snackmoney pay twitter/0xmesuthere $0.5");
   console.error("  snackmoney pay farcaster/toly 50¢");
   console.error("  snackmoney pay github/0xsnackbaker $1");
@@ -230,7 +230,7 @@ try {
     "\nUsage: snackmoney pay <platform/user> <amount> [--network <base|solana>]",
   );
   console.error("\nExamples:");
-  console.error("  snackmoney pay x/aeyakovenko 1¢");
+  console.error("  snackmoney pay x/jessepollak 1¢");
   console.error("  snackmoney pay twitter/0xmesuthere $0.5");
   console.error("  snackmoney pay farcaster/toly 50¢");
   console.error("  snackmoney pay github/0xsnackbaker $1");

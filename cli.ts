@@ -48,17 +48,17 @@ COMMANDS:
 EXAMPLES:
 
   # Single payments
-  snackmoney pay x/aeyakovenko 1¢
+  snackmoney pay x/jessepollak 1¢
   snackmoney pay x.com/0xmesuthere $0.5
-  snackmoney pay twitter.com/user 50¢
+  snackmoney pay twitter.com/aeyakovenko 50¢
   snackmoney pay farcaster.xyz/toly $1
   snackmoney pay github.com/0xsnackbaker 0.01
   snackmoney pay email/mesut@snack.money $0.25
   snackmoney pay web/snack.money 0.5
 
   # Batch payments (comma-separated)
-  snackmoney batch-pay x/user1:1¢,user2:$0.5
-  snackmoney batch-pay twitter.com/user1:1¢,user2:$0.5
+  snackmoney batch-pay x/jessepollak:1¢,aeyakovenko:$0.5
+  snackmoney batch-pay twitter.com/jessepollak:1¢,0xmesuthere:$0.5
   snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢
 
   # Batch payments (from file or URL)
@@ -66,7 +66,7 @@ EXAMPLES:
   snackmoney batch-pay https://example.com/payments.json
 
   # Batch payments (JSON string)
-  snackmoney batch-pay '{"platform":"x","payments":[{"receiver":"user","amount":"1¢"}]}'
+  snackmoney batch-pay '{"platform":"x","payments":[{"receiver":"jessepollak","amount":"1¢"}]}'
 
   # AI-powered payment across platforms
   snackmoney ai-agent --prompt "Send 1 USDC to @toly on Farcaster and 0.5 USDC to @aeyakovenko on X"

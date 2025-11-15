@@ -66,8 +66,8 @@ snackmoney pay <platform/username> <amount> [--network <base|solana>]
 ```bash
 # Send to X users
 snackmoney pay x/aeyakovenko 1¢
-snackmoney pay x.com/0xmesuthere $0.5
-snackmoney pay twitter.com/jessepollak 50¢
+snackmoney pay x.com/jessepollak $0.5
+snackmoney pay twitter.com/0xmesuthere 50¢
 
 # Send to Farcaster user
 snackmoney pay farcaster.xyz/toly $1
