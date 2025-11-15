@@ -34,8 +34,8 @@ const hasSvmKey = !!svmPrivateKey;
 
 // Debug: Show which keys are detected
 if (process.env.DEBUG) {
-  console.log(`🔍 Debug: EVM_PRIVATE_KEY = ${hasEvmKey ? 'SET' : 'NOT SET'}`);
-  console.log(`🔍 Debug: SVM_PRIVATE_KEY = ${hasSvmKey ? 'SET' : 'NOT SET'}`);
+  console.log(`🔍 Debug: EVM_PRIVATE_KEY = ${hasEvmKey ? "SET" : "NOT SET"}`);
+  console.log(`🔍 Debug: SVM_PRIVATE_KEY = ${hasSvmKey ? "SET" : "NOT SET"}`);
 }
 
 // Determine network based on provided arg or auto-detect
@@ -44,7 +44,9 @@ let useSolana: boolean;
 if (args.network) {
   // Network explicitly specified
   if (!allowedNetworks.includes(args.network.toLowerCase())) {
-    console.error(`❌ network must be either ${allowedNetworks.map(n => `'${n}'`).join(" or ")}`);
+    console.error(
+      `❌ network must be either ${allowedNetworks.map((n) => `'${n}'`).join(" or ")}`,
+    );
     process.exit(1);
   }
 
@@ -52,18 +54,26 @@ if (args.network) {
 
   // Validate the required key is available for the specified network
   if (useSolana && !hasSvmKey) {
-    console.error("❌ Missing SVM_PRIVATE_KEY environment variable (needed for --network solana)");
+    console.error(
+      "❌ Missing SVM_PRIVATE_KEY environment variable (needed for --network solana)",
+    );
     process.exit(1);
   }
   if (!useSolana && !hasEvmKey) {
-    console.error("❌ Missing EVM_PRIVATE_KEY environment variable (needed for --network base)");
+    console.error(
+      "❌ Missing EVM_PRIVATE_KEY environment variable (needed for --network base)",
+    );
     process.exit(1);
   }
 } else {
   // No network specified, auto-detect from available keys
   if (hasEvmKey && hasSvmKey) {
-    console.error("❌ Both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY environment variables are set");
-    console.error("   Please specify which network to use with --network <base|solana>");
+    console.error(
+      "❌ Both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY environment variables are set",
+    );
+    console.error(
+      "   Please specify which network to use with --network <base|solana>",
+    );
     process.exit(1);
   } else if (hasSvmKey) {
     useSolana = true;
@@ -73,24 +83,38 @@ if (args.network) {
     console.log("ℹ️  Auto-detected network: Base (based on EVM_PRIVATE_KEY)");
   } else {
     console.error("❌ No private keys found in environment variables");
-    console.error("   Set either EVM_PRIVATE_KEY (for Base) or SVM_PRIVATE_KEY (for Solana)");
+    console.error(
+      "   Set either EVM_PRIVATE_KEY (for Base) or SVM_PRIVATE_KEY (for Solana)",
+    );
     process.exit(1);
   }
 }
 
 if (!anthropicApiKey && !openaiApiKey) {
   console.error("⚠️  Warning: No AI API key set. AI features will be limited.");
-  console.error("   Set ANTHROPIC_API_KEY or OPENAI_API_KEY environment variable for better parsing.");
+  console.error(
+    "   Set ANTHROPIC_API_KEY or OPENAI_API_KEY environment variable for better parsing.",
+  );
 }
 
 if (!args.prompt) {
-  console.error("Usage: yarn ai-agent --prompt \"<your payment request>\" [--network <base|solana>]");
+  console.error(
+    'Usage: yarn ai-agent --prompt "<your payment request>" [--network <base|solana>]',
+  );
   console.log("\nExamples:");
-  console.log('  yarn ai-agent --prompt "Send 1 USDC to @toly on Farcaster and 0.5 USDC to @aeyakovenko on X"');
+  console.log(
+    '  yarn ai-agent --prompt "Send 1 USDC to @toly on Farcaster and 0.5 USDC to @aeyakovenko on X"',
+  );
   console.log('  yarn ai-agent --prompt "Pay @mesut 0.5 USDC on Farcaster"');
-  console.log('  yarn ai-agent --prompt "Send 0.25 USDC tip to @0xmesuthere on X"');
-  console.log("\nNote: If --network is not specified, it will be auto-detected based on available private keys.");
-  console.log("      If both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY are set, you must specify --network.");
+  console.log(
+    '  yarn ai-agent --prompt "Send 0.25 USDC tip to @0xmesuthere on X"',
+  );
+  console.log(
+    "\nNote: If --network is not specified, it will be auto-detected based on available private keys.",
+  );
+  console.log(
+    "      If both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY are set, you must specify --network.",
+  );
   process.exit(1);
 }
 
@@ -110,32 +134,31 @@ async function executePayment(instruction: PaymentInstruction): Promise<any> {
 
   if (useSolana) {
     // Use mainnet for production, devnet for local development
-    network = baseURL?.includes('localhost') || baseURL?.includes('127.0.0.1')
-      ? "solana-devnet"
-      : "solana";
+    network =
+      baseURL?.includes("localhost") || baseURL?.includes("127.0.0.1")
+        ? "solana-devnet"
+        : "solana";
 
     const signer = await createSigner(network, svmPrivateKey);
-    api = withPaymentInterceptor(
-      axios.create({ baseURL }),
-      signer,
-    );
+    api = withPaymentInterceptor(axios.create({ baseURL }), signer);
   } else {
     network = "base";
     const account = privateKeyToAccount(privateKey);
-    api = withPaymentInterceptor(
-      axios.create({ baseURL }),
-      account as never,
-    );
+    api = withPaymentInterceptor(axios.create({ baseURL }), account as never);
   }
 
-  console.log(`💰 Paying: ${instruction.amount} USDC → @${instruction.receiver} (${instruction.platform}) on ${useSolana ? 'Solana' : 'Base'}`);
+  console.log(
+    `💰 Paying: ${instruction.amount} USDC → @${instruction.receiver} (${instruction.platform}) on ${useSolana ? "Solana" : "Base"}`,
+  );
 
   try {
     const response = await api.post(`/payments/${instruction.platform}/pay`, {
       amount: instruction.amount,
       currency: "USDC",
       receiver: instruction.receiver,
-      description: instruction.description || `Payment via AI Agent (${useSolana ? 'Solana' : 'Ethereum'})`
+      description:
+        instruction.description ||
+        `Payment via AI Agent (${useSolana ? "Solana" : "Ethereum"})`,
     });
 
     // Display detailed receipt
@@ -144,19 +167,19 @@ async function executePayment(instruction: PaymentInstruction): Promise<any> {
       currency: "USDC",
       receiver: instruction.receiver,
       receiver_identity: instruction.platform,
-      description: instruction.description || "Payment via AI Agent"
+      description: instruction.description || "Payment via AI Agent",
     });
 
     return response.data;
   } catch (error: any) {
-    console.error('\n❌ PAYMENT FAILED');
-    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error("\n❌ PAYMENT FAILED");
+    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     if (error.response) {
       console.error(`Status: ${error.response.status}`);
       console.error(`Error: ${JSON.stringify(error.response.data, null, 2)}`);
     } else if (error.request) {
-      console.error('Network error - no response received');
+      console.error("Network error - no response received");
     } else {
       console.error(`Error: ${error.message}`);
     }
@@ -169,41 +192,41 @@ async function executePayment(instruction: PaymentInstruction): Promise<any> {
  */
 async function executeBatchPayment(
   platform: PaymentInstruction["platform"],
-  receivers: Array<{ receiver: string; amount: number }>
+  receivers: Array<{ receiver: string; amount: number }>,
 ): Promise<any> {
   let api;
   let network;
 
   if (useSolana) {
     // Use mainnet for production, devnet for local development
-    network = baseURL?.includes('localhost') || baseURL?.includes('127.0.0.1')
-      ? "solana-devnet"
-      : "solana";
+    network =
+      baseURL?.includes("localhost") || baseURL?.includes("127.0.0.1")
+        ? "solana-devnet"
+        : "solana";
 
     const signer = await createSigner(network, svmPrivateKey);
-    api = withPaymentInterceptor(
-      axios.create({ baseURL }),
-      signer,
-    );
+    api = withPaymentInterceptor(axios.create({ baseURL }), signer);
   } else {
     network = "base";
     const account = privateKeyToAccount(privateKey);
-    api = withPaymentInterceptor(
-      axios.create({ baseURL }),
-      account as never,
-    );
+    api = withPaymentInterceptor(axios.create({ baseURL }), account as never);
   }
 
-  console.log(`💰 Batch paying ${receivers.length} recipients on ${platform} using ${useSolana ? 'Solana' : 'Base'}`);
+  console.log(
+    `💰 Batch paying ${receivers.length} recipients on ${platform} using ${useSolana ? "Solana" : "Base"}`,
+  );
 
-  const totalAmount = receivers.reduce((sum, receiver) => sum + receiver.amount, 0);
+  const totalAmount = receivers.reduce(
+    (sum, receiver) => sum + receiver.amount,
+    0,
+  );
 
   try {
     const response = await api.post(`/payments/${platform}/batch-pay`, {
       currency: "USDC",
       type: "social-network",
       sender_username: "ai-payment-agent",
-      receivers
+      receivers,
     });
 
     // Display detailed batch receipt
@@ -211,19 +234,19 @@ async function executeBatchPayment(
       receivers,
       receiver_identity: platform,
       currency: "USDC",
-      totalAmount
+      totalAmount,
     });
 
     return response.data;
   } catch (error: any) {
-    console.error('\n❌ BATCH PAYMENT FAILED');
-    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error("\n❌ BATCH PAYMENT FAILED");
+    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     if (error.response) {
       console.error(`Status: ${error.response.status}`);
       console.error(`Error: ${JSON.stringify(error.response.data, null, 2)}`);
     } else if (error.request) {
-      console.error('Network error - no response received');
+      console.error("Network error - no response received");
     } else {
       console.error(`Error: ${error.message}`);
     }
@@ -234,7 +257,9 @@ async function executeBatchPayment(
 /**
  * Parse natural language payment request using AI (Claude or OpenAI)
  */
-async function parsePaymentRequest(prompt: string): Promise<PaymentInstruction[]> {
+async function parsePaymentRequest(
+  prompt: string,
+): Promise<PaymentInstruction[]> {
   // Try OpenAI first if available, then Claude, then fallback
   if (openaiApiKey) {
     return parseWithOpenAI(prompt);
@@ -242,7 +267,9 @@ async function parsePaymentRequest(prompt: string): Promise<PaymentInstruction[]
     return parseWithClaude(prompt);
   } else {
     // Fallback: Simple regex-based parsing
-    console.log("⚠️  Using regex parser. Set OPENAI_API_KEY or ANTHROPIC_API_KEY for AI parsing.");
+    console.log(
+      "⚠️  Using regex parser. Set OPENAI_API_KEY or ANTHROPIC_API_KEY for AI parsing.",
+    );
     return fallbackParser(prompt);
   }
 }
@@ -275,17 +302,17 @@ If you cannot parse valid payment instructions, return an empty array [].`;
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${openaiApiKey}`
+      Authorization: `Bearer ${openaiApiKey}`,
     },
     body: JSON.stringify({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Request: "${prompt}"` }
+        { role: "user", content: `Request: "${prompt}"` },
       ],
       temperature: 0.1,
-      max_tokens: 500
-    })
+      max_tokens: 500,
+    }),
   });
 
   if (!response.ok) {
@@ -310,7 +337,7 @@ async function parseWithClaude(prompt: string): Promise<PaymentInstruction[]> {
     headers: {
       "Content-Type": "application/json",
       "x-api-key": anthropicApiKey!,
-      "anthropic-version": "2023-06-01"
+      "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
       model: "claude-3-5-sonnet-20241022",
@@ -336,10 +363,10 @@ Example output:
   {"receiver": "bob", "amount": 1.0, "platform": "x"}
 ]
 
-If you cannot parse valid payment instructions, return an empty array [].`
-        }
-      ]
-    })
+If you cannot parse valid payment instructions, return an empty array [].`,
+        },
+      ],
+    }),
   });
 
   if (!response.ok) {
@@ -356,11 +383,17 @@ If you cannot parse valid payment instructions, return an empty array [].`
 /**
  * Parse AI response and extract JSON
  */
-function parseAIResponse(content: string, provider: string): PaymentInstruction[] {
+function parseAIResponse(
+  content: string,
+  provider: string,
+): PaymentInstruction[] {
   // Extract JSON from response (handle markdown code blocks)
   const jsonMatch = content.match(/\[[\s\S]*\]/);
   if (!jsonMatch) {
-    console.error(`❌ Could not parse ${provider} response. Raw response:`, content);
+    console.error(
+      `❌ Could not parse ${provider} response. Raw response:`,
+      content,
+    );
     console.log("⚠️  Using regex fallback...");
     return fallbackParser(content);
   }
@@ -368,7 +401,15 @@ function parseAIResponse(content: string, provider: string): PaymentInstruction[
   const instructions = JSON.parse(jsonMatch[0]);
 
   // Display parsed instructions
-  console.log(`📋 Found ${instructions.length} payment(s):`, instructions.map((inst: PaymentInstruction) => `${inst.amount} USDC → @${inst.receiver} (${inst.platform})`).join(', '));
+  console.log(
+    `📋 Found ${instructions.length} payment(s):`,
+    instructions
+      .map(
+        (inst: PaymentInstruction) =>
+          `${inst.amount} USDC → @${inst.receiver} (${inst.platform})`,
+      )
+      .join(", "),
+  );
 
   return instructions;
 }
@@ -392,30 +433,38 @@ function fallbackParser(prompt: string): PaymentInstruction[] {
   for (const pattern of patterns) {
     let match;
     while ((match = pattern.exec(prompt)) !== null) {
-      if (pattern.source.includes('send')) {
+      if (pattern.source.includes("send")) {
         instructions.push({
           receiver: match[2],
           amount: parseFloat(match[1]),
-          platform: match[3].toLowerCase() as any
+          platform: match[3].toLowerCase() as any,
         });
-      } else if (pattern.source.includes('pay')) {
+      } else if (pattern.source.includes("pay")) {
         instructions.push({
           receiver: match[1],
           amount: parseFloat(match[2]),
-          platform: match[3].toLowerCase() as any
+          platform: match[3].toLowerCase() as any,
         });
       } else {
         instructions.push({
           receiver: match[1],
           amount: parseFloat(match[3]),
-          platform: match[2].toLowerCase() as any
+          platform: match[2].toLowerCase() as any,
         });
       }
     }
   }
 
   if (instructions.length > 0) {
-    console.log(`📋 Found ${instructions.length} payment(s):`, instructions.map(inst => `${inst.amount} USDC → @${inst.receiver} (${inst.platform})`).join(', '));
+    console.log(
+      `📋 Found ${instructions.length} payment(s):`,
+      instructions
+        .map(
+          (inst) =>
+            `${inst.amount} USDC → @${inst.receiver} (${inst.platform})`,
+        )
+        .join(", "),
+    );
   }
 
   return instructions;
@@ -426,10 +475,10 @@ function fallbackParser(prompt: string): PaymentInstruction[] {
  */
 async function main() {
   const networkName = useSolana
-    ? (baseURL?.includes('localhost') || baseURL?.includes('127.0.0.1')
-      ? 'Solana Devnet'
-      : 'Solana Mainnet')
-    : 'Base';
+    ? baseURL?.includes("localhost") || baseURL?.includes("127.0.0.1")
+      ? "Solana Devnet"
+      : "Solana Mainnet"
+    : "Base";
 
   console.log(`🚀 AI Agent: "${args.prompt}"`);
   console.log(`🌐 Network: ${networkName}\n`);
@@ -439,16 +488,24 @@ async function main() {
     const instructions = await parsePaymentRequest(args.prompt);
 
     if (instructions.length === 0) {
-      console.log("❌ No valid payment instructions found. Try: 'Send 0.5 USDC to alice on farcaster'");
+      console.log(
+        "❌ No valid payment instructions found. Try: 'Send 0.5 USDC to alice on farcaster'",
+      );
       process.exit(1);
     }
 
     // Step 2: Group by platform for batch processing
-    const byPlatform = instructions.reduce((acc, inst) => {
-      if (!acc[inst.platform]) acc[inst.platform] = [];
-      acc[inst.platform].push({ receiver: inst.receiver, amount: inst.amount });
-      return acc;
-    }, {} as Record<string, Array<{ receiver: string; amount: number }>>);
+    const byPlatform = instructions.reduce(
+      (acc, inst) => {
+        if (!acc[inst.platform]) acc[inst.platform] = [];
+        acc[inst.platform].push({
+          receiver: inst.receiver,
+          amount: inst.amount,
+        });
+        return acc;
+      },
+      {} as Record<string, Array<{ receiver: string; amount: number }>>,
+    );
 
     // Step 3: Execute payments
     console.log("\n💳 Processing payments...");
@@ -457,7 +514,10 @@ async function main() {
     for (const [platform, receivers] of Object.entries(byPlatform)) {
       if (receivers.length === 1) {
         // Single payment
-        const inst = instructions.find(i => i.platform === platform && i.receiver === receivers[0].receiver)!;
+        const inst = instructions.find(
+          (i) =>
+            i.platform === platform && i.receiver === receivers[0].receiver,
+        )!;
         await executePayment(inst);
       } else {
         // Batch payment
@@ -467,7 +527,6 @@ async function main() {
 
     console.log("\n✅ All payments completed successfully!");
     console.log("━".repeat(60));
-
   } catch (error: any) {
     console.error("\n💥 Error:", error.message);
     process.exit(1);
@@ -475,15 +534,21 @@ async function main() {
 }
 
 function displayReceipt(response: any, paymentDetails: any) {
-  console.log(`✅ ${response.data?.msg || 'Payment sent'} | 💰 ${paymentDetails.amount} ${paymentDetails.currency} → ${paymentDetails.receiver}`);
+  console.log(
+    `✅ ${response.data?.msg || "Payment sent"} | 💰 ${paymentDetails.amount} ${paymentDetails.currency} → ${paymentDetails.receiver}`,
+  );
   if (response.data?.txn_id) console.log(`� TXN: ${response.data.txn_id}`);
-  if (response.data?.receipt) console.log(`� Receipt: ${response.data.receipt}`);
+  if (response.data?.receipt)
+    console.log(`� Receipt: ${response.data.receipt}`);
 }
 
 function displayBatchReceipt(response: any, paymentDetails: any) {
-  console.log(`✅ ${response.data?.msg || 'Batch payment sent'} | 💰 ${paymentDetails.totalAmount} ${paymentDetails.currency} → ${paymentDetails.receivers.length} recipients`);
+  console.log(
+    `✅ ${response.data?.msg || "Batch payment sent"} | 💰 ${paymentDetails.totalAmount} ${paymentDetails.currency} → ${paymentDetails.receivers.length} recipients`,
+  );
   if (response.data?.txn_id) console.log(`� TXN: ${response.data.txn_id}`);
-  if (response.data?.receipt) console.log(`� Receipt: ${response.data.receipt}`);
+  if (response.data?.receipt)
+    console.log(`� Receipt: ${response.data.receipt}`);
 }
 
 main();
