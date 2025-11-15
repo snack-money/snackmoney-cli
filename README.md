@@ -28,11 +28,13 @@ brew install snackmoney
 1. **Set up your private key**:
 
    For Solana payments:
+
    ```bash
    export SVM_PRIVATE_KEY="your_solana_private_key"
    ```
 
    For Base payments:
+
    ```bash
    export EVM_PRIVATE_KEY="your_evm_private_key"
    ```
@@ -40,13 +42,15 @@ brew install snackmoney
 2. **Send your first payment**:
 
    On Solana:
+
    ```bash
-   npx snackmoney pay --receiver_identity x --receiver 0xmesuthere --amount 0.01 --network solana
+   npx snackmoney pay x/aeyakovenko 1¢
    ```
 
    On Base:
+
    ```bash
-   npx snackmoney pay --receiver_identity x --receiver 0xmesuthere --amount 0.01 --network base
+   npx snackmoney pay x/jessepollak $0.5
    ```
 
 ## 📖 Commands
@@ -54,35 +58,106 @@ brew install snackmoney
 ### `pay` - Send Single Payment
 
 ```bash
-snackmoney pay --receiver_identity <identity> --receiver <username> --amount <amount> [--network <base|solana>]
+snackmoney pay <platform/username> <amount> [--network <base|solana>]
 ```
 
 **Examples:**
+
 ```bash
-# Send to X user on Solana
-snackmoney pay --receiver_identity x --receiver 0xmesuthere --amount 0.5 --network solana
+# Send to X users
+snackmoney pay x/aeyakovenko 1¢
+snackmoney pay x.com/jessepollak $0.5
+snackmoney pay twitter.com/0xmesuthere 50¢
 
-# Send to Farcaster user on Base
-snackmoney pay --receiver_identity farcaster --receiver mesut --amount 0.5 --network base
+# Send to Farcaster user
+snackmoney pay farcaster.xyz/toly $1
 
-# Send to GitHub user on Solana
-snackmoney pay --receiver_identity github --receiver 0xsnackbaker --amount 0.5 --network solana
+# Send to GitHub user
+snackmoney pay github.com/0xsnackbaker 0.01
+
+# Send to email
+snackmoney pay email/mesut@snack.money $0.25
+
+# Send to web domain
+snackmoney pay web/snack.money 0.5
 ```
+
+**Supported platforms:**
+
+- `x`, `x.com`, `twitter`, `twitter.com` - X/Twitter
+- `farcaster`, `farcaster.xyz` - Farcaster
+- `github`, `github.com` - GitHub
+- `email` - Email addresses
+- `web` - Web domains
+
+**Amount formats:**
+
+- `1¢`, `50¢` - Cents notation
+- `$0.5`, `$1` - Dollar notation
+- `0.5`, `0.01` - Decimal notation
 
 ### `batch-pay` - Send Batch Payments
 
+Send payments to multiple users at once using comma-separated format, JSON file, or URL.
+
+**Format 1: Comma-separated**
+
 ```bash
-snackmoney batch-pay --receiver_identity <identity> --receivers '<json>' [--network <base|solana>]
+snackmoney batch-pay <platform/user1:amount1,user2:amount2,...> [--network <base|solana>]
 ```
 
 **Examples:**
-```bash
-# Send to multiple X users on Solana
-snackmoney batch-pay --receiver_identity x --receivers '[{"receiver":"0xmesuthere","amount":0.5},{"receiver":"aeyakovenko","amount":0.25}]' --network solana
 
-# Send to multiple Farcaster users on Base
-snackmoney batch-pay --receiver_identity farcaster --receivers '[{"receiver":"toly","amount":0.5},{"receiver":"mesut","amount":0.25}]' --network base
+```bash
+# Solana
+snackmoney batch-pay x/aeyakovenko:7¢,0xMert_:3¢,0xmesuthere:5¢ --network solana
+
+# Base
+snackmoney batch-pay x/MurrLincoln:2¢,kleffew94:9¢,jessepollak:4¢,0xmesuthere:6¢ --network base
+
+# With domain extensions
+snackmoney batch-pay twitter.com/user1:1¢,user2:$0.5
+snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢
 ```
+
+**Format 2: From file**
+
+```bash
+snackmoney batch-pay ./examples/payments-solana.json
+snackmoney batch-pay ./examples/payments-base.json
+snackmoney batch-pay file:./payments.json
+```
+
+**Format 3: From URL**
+
+```bash
+snackmoney batch-pay https://example.com/payments.json
+snackmoney batch-pay http://localhost:3000/payments.json
+```
+
+**Format 4: JSON string**
+
+```bash
+snackmoney batch-pay '{"platform":"x","payments":[{"receiver":"aeyakovenko","amount":"1¢"}]}'
+```
+
+**JSON file format:**
+
+```json
+{
+  "platform": "x",
+  "payments": [
+    { "receiver": "aeyakovenko", "amount": "7¢" },
+    { "receiver": "0xMert_", "amount": "3¢" },
+    { "receiver": "0xmesuthere", "amount": "5¢" }
+  ]
+}
+```
+
+See example files:
+
+- [`examples/payments-solana.json`](examples/payments-solana.json)
+- [`examples/payments-base.json`](examples/payments-base.json)
 
 ### `ai-agent` - AI-Powered Payment Agent
 
@@ -91,6 +166,7 @@ snackmoney ai-agent --prompt "<natural language request>"
 ```
 
 **Examples:**
+
 ```bash
 # Single payment on Solana
 snackmoney ai-agent --prompt "Send 0.5 USDC to @0xmesuthere on X via Solana"
@@ -120,9 +196,9 @@ snackmoney ai-agent --prompt "Send 1 USDC to @mesut on Farcaster and 0.5 USDC to
 
 ## 🌐 Supported Platforms
 
-- **farcaster** - Farcaster social network
-- **x** - X (formerly Twitter)
-- **github** - GitHub
+- **x, x.com, twitter, twitter.com** - X (formerly Twitter)
+- **farcaster, farcaster.xyz** - Farcaster social network
+- **github, github.com** - GitHub
 - **email** - Email addresses
 - **web** - Web domains
 
@@ -130,29 +206,33 @@ snackmoney ai-agent --prompt "Send 1 USDC to @mesut on Farcaster and 0.5 USDC to
 
 ### Prerequisites
 
-* **Node.js v20+** (Install via [nvm](https://github.com/nvm-sh/nvm))
-* **Yarn**
-* **Private key**: `SVM_PRIVATE_KEY` (for Solana) or `EVM_PRIVATE_KEY` (for Base)
+- **Node.js v20+** (Install via [nvm](https://github.com/nvm-sh/nvm))
+- **Yarn**
+- **Private key**: `SVM_PRIVATE_KEY` (for Solana) or `EVM_PRIVATE_KEY` (for Base)
 
 ### Setup
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/snack-money/snackmoney-cli.git
    cd snackmoney-cli
    ```
 
 2. **Install dependencies**:
+
    ```bash
    yarn install
    ```
 
 3. **Configure environment variables**:
+
    ```bash
    cp .env-local .env
    ```
 
    Edit `.env` and add your private key(s):
+
    ```bash
    # For Solana payments
    SVM_PRIVATE_KEY=your_solana_private_key
@@ -167,23 +247,32 @@ snackmoney ai-agent --prompt "Send 1 USDC to @mesut on Farcaster and 0.5 USDC to
 
 ```bash
 # X user on Solana
-yarn pay --receiver_identity x --receiver 0xmesuthere --amount 0.01 --network solana
+yarn pay x/aeyakovenko 1¢ --network solana
 
-# Farcaster user on Base
-yarn pay --receiver_identity farcaster --receiver toly --amount 0.01 --network base
+# X user on Base
+yarn pay x/jessepollak $0.5 --network base
 
-# GitHub user on Solana
-yarn pay --receiver_identity github --receiver 0xsnackbaker --amount 0.01 --network solana
+# Farcaster user
+yarn pay farcaster.xyz/toly 0.01
+
+# GitHub user
+yarn pay github.com/0xsnackbaker $1
 ```
 
 #### Batch Payments
 
 ```bash
-# Multiple X users on Solana
-yarn batch-pay --receiver_identity x --receivers '[{"receiver":"0xmesuthere","amount":0.5},{"receiver":"aeyakovenko","amount":0.25}]' --network solana
+# Solana - Comma-separated
+yarn batch-pay x/aeyakovenko:7¢,0xMert_:3¢,0xmesuthere:5¢ --network solana
 
-# Multiple Farcaster users on Base
-yarn batch-pay --receiver_identity farcaster --receivers '[{"receiver":"toly","amount":0.5},{"receiver":"mesut","amount":0.25}]' --network base
+# Base - Comma-separated
+yarn batch-pay x/MurrLincoln:2¢,kleffew94:9¢,jessepollak:4¢,0xmesuthere:6¢ --network base
+
+# From file
+yarn batch-pay ./examples/payments-solana.json
+
+# From URL
+yarn batch-pay https://example.com/payments.json
 ```
 
 #### AI Agent
@@ -194,10 +283,12 @@ yarn ai-agent --prompt "Send 1 USDC to @mesut on Farcaster and 0.5 USDC to @aeya
 
 ## 📝 Notes
 
-* Payments can be processed on **Solana** or **Base** networks
-* The identity type must match the platform the user is on (farcaster, x, github, email, web)
-* For Solana payments: Ensure your `SVM_PRIVATE_KEY` is secure and your address is funded with sufficient USDC on Solana
-* For Base payments: Ensure your `EVM_PRIVATE_KEY` is secure and your address is funded with sufficient USDC on Base
+- Payments can be processed on **Solana** or **Base** networks
+- Use platform identifiers: `x`, `farcaster`, `github`, `email`, or `web` (with optional domain extensions)
+- All amount formats supported: cents (`1¢`), dollars (`$0.5`), or decimal (`0.5`)
+- For Solana payments: Ensure your `SVM_PRIVATE_KEY` is secure and your address is funded with sufficient USDC on Solana
+- For Base payments: Ensure your `EVM_PRIVATE_KEY` is secure and your address is funded with sufficient USDC on Base
+- Network is auto-detected based on which private key is set (or specify with `--network` flag)
 
 ## 📚 Documentation
 
@@ -211,4 +302,3 @@ MIT
 ---
 
 **Happy sending! 🍪💸**
-

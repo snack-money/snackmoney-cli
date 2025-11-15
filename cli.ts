@@ -15,7 +15,7 @@ const __dirname = dirname(__filename);
 
 // Read version from package.json
 const packageJson = JSON.parse(
-  readFileSync(join(__dirname, "../package.json"), "utf-8")
+  readFileSync(join(__dirname, "../package.json"), "utf-8"),
 );
 const VERSION = packageJson.version;
 
@@ -47,21 +47,55 @@ COMMANDS:
 
 EXAMPLES:
 
-  # Single payment to X user
-  snackmoney pay --receiver_identity x --receiver 0xmesuthere --amount 0.01
+  # Single payments
+  snackmoney pay x/jessepollak 1¢
+  snackmoney pay x.com/0xmesuthere $0.5
+  snackmoney pay twitter.com/aeyakovenko 50¢
+  snackmoney pay farcaster.xyz/toly $1
+  snackmoney pay github.com/0xsnackbaker 0.01
+  snackmoney pay email/mesut@snack.money $0.25
+  snackmoney pay web/snack.money 0.5
 
-  # Single payment to Farcaster user
-  snackmoney pay --receiver_identity farcaster --receiver mesut --amount 0.01
+  # Batch payments (comma-separated)
+  snackmoney batch-pay x/jessepollak:1¢,aeyakovenko:$0.5
+  snackmoney batch-pay twitter.com/jessepollak:1¢,0xmesuthere:$0.5
+  snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢
 
-  # Batch payment to multiple X users
-  snackmoney batch-pay --receiver_identity x --receivers '[{"receiver":"0xmesuthere","amount":0.5},{"receiver":"aeyakovenko","amount":0.25}]'
+  # Batch payments (from file or URL)
+  snackmoney batch-pay ./payments.json
+  snackmoney batch-pay https://example.com/payments.json
+
+  # Batch payments (JSON string)
+  snackmoney batch-pay '{"platform":"x","payments":[{"receiver":"jessepollak","amount":"1¢"}]}'
 
   # AI-powered payment across platforms
   snackmoney ai-agent --prompt "Send 1 USDC to @toly on Farcaster and 0.5 USDC to @aeyakovenko on X"
 
+SUPPORTED PLATFORMS:
+  x, x.com, twitter, twitter.com    X/Twitter
+  farcaster, farcaster.xyz          Farcaster
+  github, github.com                GitHub
+  email                             Email
+  web                               Web
+
+AMOUNT FORMATS:
+  1¢               Cents notation
+  $0.5             Dollar notation
+  0.5              Decimal notation
+
+BATCH PAYMENT JSON FORMAT:
+  {
+    "platform": "x",
+    "payments": [
+      {"receiver": "aeyakovenko", "amount": "1¢"},
+      {"receiver": "0xmesuthere", "amount": "$0.5"}
+    ]
+  }
+
 OPTIONS:
   --help, -h       Show this help message
   --version, -v    Show version number
+  --network        Specify network (base or solana)
 
 ENVIRONMENT VARIABLES:
   SVM_PRIVATE_KEY       Your Solana private key (required)
