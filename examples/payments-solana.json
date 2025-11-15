@@ -1,0 +1,17 @@
+{
+  "platform": "x",
+  "payments": [
+    {
+      "receiver": "aeyakovenko",
+      "amount": "7¢"
+    },
+    {
+      "receiver": "0xMert_",
+      "amount": "3¢"
+    },
+    {
+      "receiver": "0xmesuthere",
+      "amount": "5¢"
+    }
+  ]
+}

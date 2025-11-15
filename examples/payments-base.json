@@ -1,0 +1,21 @@
+{
+  "platform": "x",
+  "payments": [
+    {
+      "receiver": "MurrLincoln",
+      "amount": "2¢"
+    },
+    {
+      "receiver": "kleffew94",
+      "amount": "9¢"
+    },
+    {
+      "receiver": "jessepollak",
+      "amount": "4¢"
+    },
+    {
+      "receiver": "0xmesuthere",
+      "amount": "6¢"
+    }
+  ]
+}
