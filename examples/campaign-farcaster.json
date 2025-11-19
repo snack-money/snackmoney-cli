@@ -1,0 +1,11 @@
+{
+  "platform": "farcaster",
+  "name": "10 Free Cookies for Farcaster",
+  "description": "Share the love! Send free cookies to your friends on Farcaster and grow the community.",
+  "totalCookies": 10,
+  "sponsor": {
+    "name": "Snack Money",
+    "handle": "snackmoney",
+    "url": "https://snack.money"
+  }
+}
