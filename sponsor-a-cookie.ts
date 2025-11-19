@@ -200,7 +200,7 @@ const args = minimist(process.argv.slice(2));
 
 if (args._.length < 1) {
   console.error(`
-Usage: snackmoney create-campaign <json-input> [--network <base|solana>]
+Usage: snackmoney sponsor-a-cookie <json-input> [--network <base|solana>]
 
 JSON Input Options:
   ./campaign.json                      Read from local file
@@ -230,9 +230,9 @@ Example JSON:
 }
 
 Examples:
-  snackmoney create-campaign ./campaign.json
-  snackmoney create-campaign https://example.com/campaign.json
-  snackmoney create-campaign '{"platform":"x","name":"Free Cookies",...}'
+  snackmoney sponsor-a-cookie ./campaign.json
+  snackmoney sponsor-a-cookie https://example.com/campaign.json
+  snackmoney sponsor-a-cookie '{"platform":"x","name":"Free Cookies",...}'
 
 Note: If --network is not specified, it will be auto-detected based on available private keys.
 `);

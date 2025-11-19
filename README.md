@@ -178,12 +178,12 @@ snackmoney ai-agent --prompt "Send 0.5 USDC to @0xmesuthere on X via Base"
 snackmoney ai-agent --prompt "Send 1 USDC to @toly on Farcaster and 0.5 USDC to @aeyakovenko on X via Solana"
 ```
 
-### `create-campaign` - Create Cookie Campaigns
+### `sponsor-a-cookie` - Create Cookie Campaigns
 
 Create cookie campaigns on X (Twitter) or Farcaster platforms. Campaigns distribute free "cookies" (USDC tokens) to users who interact with your campaign.
 
 ```bash
-snackmoney create-campaign <json-input> [--network <base|solana>]
+snackmoney sponsor-a-cookie <json-input> [--network <base|solana>]
 ```
 
 **JSON Input Options:**
@@ -208,13 +208,13 @@ snackmoney create-campaign <json-input> [--network <base|solana>]
 
 ```bash
 # From JSON file
-snackmoney create-campaign ./campaign.json
+snackmoney sponsor-a-cookie ./campaign.json
 
 # From URL
-snackmoney create-campaign https://example.com/campaign.json
+snackmoney sponsor-a-cookie https://example.com/campaign.json
 
 # Inline JSON
-snackmoney create-campaign '{"platform":"x","name":"Free Cookies","description":"Send cookies to friends!","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
+snackmoney sponsor-a-cookie '{"platform":"x","name":"Free Cookies","description":"Send cookies to friends!","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
 ```
 
 **JSON Format:**
@@ -354,10 +354,10 @@ yarn ai-agent --prompt "Send 1 USDC to @mesut on Farcaster and 0.5 USDC to @aeya
 
 ```bash
 # From file
-yarn tsx create-campaign.ts ./examples/campaign-x.json
+yarn tsx sponsor-a-cookie.ts ./examples/campaign-x.json
 
 # Inline JSON
-yarn tsx create-campaign.ts '{"platform":"farcaster","name":"Test Campaign","description":"This is a test campaign","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
+yarn tsx sponsor-a-cookie.ts '{"platform":"farcaster","name":"Test Campaign","description":"This is a test campaign","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
 ```
 
 ## 📝 Notes

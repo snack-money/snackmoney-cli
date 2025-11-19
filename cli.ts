@@ -23,7 +23,7 @@ const commands = {
   pay: "pay.js",
   "batch-pay": "batch_pay.js",
   "ai-agent": "ai-payment-agent.js",
-  "create-campaign": "create-campaign.js",
+  "sponsor-a-cookie": "sponsor-a-cookie.js",
 };
 
 function showVersion() {
@@ -45,7 +45,7 @@ COMMANDS:
   pay                           Send payment to a single receiver on Solana
   batch-pay                     Send batch payments to multiple receivers on Solana
   ai-agent                      AI-powered payment agent with natural language
-  create-campaign               Create cookie campaign on X or Farcaster
+  sponsor-a-cookie              Create cookie campaign on X or Farcaster
 
 EXAMPLES:
 
@@ -74,9 +74,9 @@ EXAMPLES:
   snackmoney ai-agent --prompt "Send 1 USDC to @toly on Farcaster and 0.5 USDC to @aeyakovenko on X"
 
   # Create cookie campaigns
-  snackmoney create-campaign ./campaign.json
-  snackmoney create-campaign https://example.com/campaign.json
-  snackmoney create-campaign '{"platform":"x","name":"Free Cookies","description":"Send cookies to friends!","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
+  snackmoney sponsor-a-cookie ./campaign.json
+  snackmoney sponsor-a-cookie https://example.com/campaign.json
+  snackmoney sponsor-a-cookie '{"platform":"x","name":"Free Cookies","description":"Send cookies to friends!","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
 
 SUPPORTED PLATFORMS:
   x, x.com, twitter, twitter.com    X/Twitter
