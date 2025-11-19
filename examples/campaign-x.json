@@ -1,0 +1,11 @@
+{
+  "platform": "x",
+  "name": "5 Free Cookies Campaign",
+  "description": "Send free cookies to your friends on X and build community!",
+  "totalCookies": 5,
+  "sponsor": {
+    "name": "Snack Money",
+    "handle": "snackmoneyapp",
+    "url": "https://snack.money"
+  }
+}
