@@ -1,6 +1,6 @@
 {
   "name": "snackmoney",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "CLI tool for sending USDC payments via Snack Money API using x402 protocol",
   "type": "module",
   "bin": {
