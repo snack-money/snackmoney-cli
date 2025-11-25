@@ -19,16 +19,18 @@ const baseURL = process.env.RESOURCE_SERVER_URL || "https://api.snack.money";
  * - "50¢" -> 0.50
  * - "$0.5" or "$0.50" -> 0.50
  * - "0.5" -> 0.50
+ *
+ * @param amountStr
  */
 function parseAmount(amountStr: string | number): number {
-  if (typeof amountStr === 'number') {
+  if (typeof amountStr === "number") {
     return amountStr;
   }
 
   const trimmed = amountStr.trim();
 
   // Handle cents notation (50¢)
-  if (trimmed.endsWith('¢')) {
+  if (trimmed.endsWith("¢")) {
     const cents = parseFloat(trimmed.slice(0, -1));
     if (isNaN(cents)) {
       throw new Error(`Invalid cents amount: ${amountStr}`);
@@ -37,7 +39,7 @@ function parseAmount(amountStr: string | number): number {
   }
 
   // Handle dollar notation ($0.5 or $0.50)
-  if (trimmed.startsWith('$')) {
+  if (trimmed.startsWith("$")) {
     const dollars = parseFloat(trimmed.slice(1));
     if (isNaN(dollars)) {
       throw new Error(`Invalid dollar amount: ${amountStr}`);
@@ -56,35 +58,52 @@ function parseAmount(amountStr: string | number): number {
 /**
  * Validate X/Twitter username
  * Rules: 1-15 characters, alphanumeric and underscores only
+ *
+ * @param username
  */
 function validateXUsername(username: string): void {
   if (!/^[a-zA-Z0-9_]{1,15}$/.test(username)) {
-    throw new Error(`Invalid X/Twitter username: ${username}. Must be 1-15 alphanumeric characters or underscores.`);
+    throw new Error(
+      `Invalid X/Twitter username: ${username}. Must be 1-15 alphanumeric characters or underscores.`,
+    );
   }
 }
 
 /**
  * Validate Farcaster username
  * Rules: 1-16 characters, alphanumeric, hyphens, and underscores, must start with alphanumeric
+ *
+ * @param username
  */
 function validateFarcasterUsername(username: string): void {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,15}$/.test(username)) {
-    throw new Error(`Invalid Farcaster username: ${username}. Must be 1-16 characters, start with alphanumeric, contain only letters, numbers, hyphens, and underscores.`);
+    throw new Error(
+      `Invalid Farcaster username: ${username}. Must be 1-16 characters, start with alphanumeric, contain only letters, numbers, hyphens, and underscores.`,
+    );
   }
 }
 
 /**
  * Validate GitHub username
  * Rules: 1-39 characters, alphanumeric and hyphens, cannot start/end with hyphen, no consecutive hyphens
+ *
+ * @param username
  */
 function validateGitHubUsername(username: string): void {
-  if (!/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/.test(username) || /--/.test(username)) {
-    throw new Error(`Invalid GitHub username: ${username}. Must be 1-39 alphanumeric characters or hyphens, cannot start/end with hyphen or have consecutive hyphens.`);
+  if (
+    !/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/.test(username) ||
+    /--/.test(username)
+  ) {
+    throw new Error(
+      `Invalid GitHub username: ${username}. Must be 1-39 alphanumeric characters or hyphens, cannot start/end with hyphen or have consecutive hyphens.`,
+    );
   }
 }
 
 /**
  * Validate email address
+ *
+ * @param email
  */
 function validateEmail(email: string): void {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -96,32 +115,40 @@ function validateEmail(email: string): void {
 /**
  * Validate web domain
  * Rules: Valid domain name format
+ *
+ * @param domain
  */
 function validateWebDomain(domain: string): void {
-  const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+  const domainRegex =
+    /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
   if (!domainRegex.test(domain)) {
-    throw new Error(`Invalid web domain: ${domain}. Must be a valid domain name (e.g., snack.money)`);
+    throw new Error(
+      `Invalid web domain: ${domain}. Must be a valid domain name (e.g., snack.money)`,
+    );
   }
 }
 
 /**
  * Validate receiver based on platform
+ *
+ * @param platform
+ * @param receiver
  */
 function validateReceiver(platform: string, receiver: string): void {
   switch (platform) {
-    case 'x':
+    case "x":
       validateXUsername(receiver);
       break;
-    case 'farcaster':
+    case "farcaster":
       validateFarcasterUsername(receiver);
       break;
-    case 'github':
+    case "github":
       validateGitHubUsername(receiver);
       break;
-    case 'email':
+    case "email":
       validateEmail(receiver);
       break;
-    case 'web':
+    case "web":
       validateWebDomain(receiver);
       break;
   }
@@ -132,26 +159,30 @@ function validateReceiver(platform: string, receiver: string): void {
  * - "x.com", "twitter.com", "twitter", "x" -> "x"
  * - "farcaster.xyz", "farcaster" -> "farcaster"
  * - "github.com", "github" -> "github"
+ *
+ * @param platform
  */
 function normalizePlatform(platform: string): string {
   const lower = platform.toLowerCase();
 
   const platformMap: Record<string, string> = {
-    'x': 'x',
-    'x.com': 'x',
-    'twitter': 'x',
-    'twitter.com': 'x',
-    'farcaster': 'farcaster',
-    'farcaster.xyz': 'farcaster',
-    'github': 'github',
-    'github.com': 'github',
-    'email': 'email',
-    'web': 'web',
+    x: "x",
+    "x.com": "x",
+    twitter: "x",
+    "twitter.com": "x",
+    farcaster: "farcaster",
+    "farcaster.xyz": "farcaster",
+    github: "github",
+    "github.com": "github",
+    email: "email",
+    web: "web",
   };
 
   const normalized = platformMap[lower];
   if (!normalized) {
-    throw new Error(`Unknown platform: ${platform}. Supported: x, twitter, farcaster, github, email, web (with optional domain extensions)`);
+    throw new Error(
+      `Unknown platform: ${platform}. Supported: x, twitter, farcaster, github, email, web (with optional domain extensions)`,
+    );
   }
 
   return normalized;
@@ -160,12 +191,19 @@ function normalizePlatform(platform: string): string {
 /**
  * Parse comma-separated receivers format:
  * "x/user1:1¢,user2:$0.5,user3:75¢"
+ *
+ * @param input
  */
-function parseCommaSeparated(input: string): { platform: string; payments: Array<{receiver: string, amount: number}> } {
+function parseCommaSeparated(input: string): {
+  platform: string;
+  payments: Array<{ receiver: string; amount: number }>;
+} {
   // Split by first slash to get platform and receivers
-  const firstSlash = input.indexOf('/');
+  const firstSlash = input.indexOf("/");
   if (firstSlash === -1) {
-    throw new Error(`Invalid format: ${input}. Expected: platform/receiver1:amount1,receiver2:amount2`);
+    throw new Error(
+      `Invalid format: ${input}. Expected: platform/receiver1:amount1,receiver2:amount2`,
+    );
   }
 
   const platformStr = input.substring(0, firstSlash);
@@ -174,11 +212,11 @@ function parseCommaSeparated(input: string): { platform: string; payments: Array
   const platform = normalizePlatform(platformStr);
 
   // Split by comma to get individual receiver:amount pairs
-  const pairs = receiversStr.split(',');
-  const payments: Array<{receiver: string, amount: number}> = [];
+  const pairs = receiversStr.split(",");
+  const payments: Array<{ receiver: string; amount: number }> = [];
 
   for (const pair of pairs) {
-    const colonIndex = pair.lastIndexOf(':');
+    const colonIndex = pair.lastIndexOf(":");
     if (colonIndex === -1) {
       throw new Error(`Missing amount for ${pair}. Format: receiver:amount`);
     }
@@ -200,13 +238,17 @@ function parseCommaSeparated(input: string): { platform: string; payments: Array
 
 /**
  * Load JSON from file path
+ *
+ * @param filePath
  */
 async function loadFromFile(filePath: string): Promise<any> {
   try {
     // Remove file: prefix if present
-    const cleanPath = filePath.startsWith('file:') ? filePath.substring(5) : filePath;
+    const cleanPath = filePath.startsWith("file:")
+      ? filePath.substring(5)
+      : filePath;
     const absolutePath = resolve(cleanPath);
-    const content = readFileSync(absolutePath, 'utf-8');
+    const content = readFileSync(absolutePath, "utf-8");
     return JSON.parse(content);
   } catch (error: any) {
     throw new Error(`Failed to read file ${filePath}: ${error.message}`);
@@ -215,6 +257,8 @@ async function loadFromFile(filePath: string): Promise<any> {
 
 /**
  * Load JSON from HTTP/HTTPS URL
+ *
+ * @param url
  */
 async function loadFromURL(url: string): Promise<any> {
   try {
@@ -227,8 +271,13 @@ async function loadFromURL(url: string): Promise<any> {
 
 /**
  * Parse JSON format payments
+ *
+ * @param data
  */
-function parseJSONPayments(data: any): { platform: string; payments: Array<{receiver: string, amount: number}> } {
+function parseJSONPayments(data: any): {
+  platform: string;
+  payments: Array<{ receiver: string; amount: number }>;
+} {
   if (!data.platform) {
     throw new Error('JSON must contain "platform" field');
   }
@@ -237,7 +286,7 @@ function parseJSONPayments(data: any): { platform: string; payments: Array<{rece
   }
 
   const platform = normalizePlatform(data.platform);
-  const payments: Array<{receiver: string, amount: number}> = [];
+  const payments: Array<{ receiver: string; amount: number }> = [];
 
   for (const payment of data.payments) {
     if (!payment.receiver) {
@@ -262,64 +311,79 @@ function parseJSONPayments(data: any): { platform: string; payments: Array<{rece
 const args = minimist(process.argv.slice(2));
 
 let receiverIdentity: string;
-let receivers: Array<{receiver: string, amount: number}>;
+let receivers: Array<{ receiver: string; amount: number }>;
 let useSolana: boolean;
 
 if (args.help || args.h) {
-  console.log("Usage: snackmoney batch-pay <input> [--network <base|solana>]");
+  console.log("Usage: snackmoney batch-send <input> [--network <base|solana>]");
   console.log("\nInput formats:");
   console.log("  1. Comma-separated: x/jessepollak:1¢,aeyakovenko:$0.5");
-  console.log("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"jessepollak\",\"amount\":\"1¢\"}]}'");
+  console.log(
+    '  2. JSON string: \'{"platform":"x","payments":[{"receiver":"jessepollak","amount":"1¢"}]}\'',
+  );
   console.log("  3. File path: ./payments.json or file:./payments.json");
   console.log("  4. HTTP URL: https://example.com/payments.json");
   console.log("\nExamples:");
-  console.log("  snackmoney batch-pay x/jessepollak:1¢,aeyakovenko:$0.5");
-  console.log("  snackmoney batch-pay x.com/jessepollak:1¢,0xmesuthere:$0.5");
-  console.log("  snackmoney batch-pay twitter.com/jessepollak:1¢,aeyakovenko:$0.5");
-  console.log("  snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢");
-  console.log("  snackmoney batch-pay ./payments.json");
-  console.log("  snackmoney batch-pay https://example.com/payments.json");
+  console.log("  snackmoney batch-send x/jessepollak:1¢,aeyakovenko:$0.5");
+  console.log("  snackmoney batch-send x.com/jessepollak:1¢,0xmesuthere:$0.5");
+  console.log(
+    "  snackmoney batch-send twitter.com/jessepollak:1¢,aeyakovenko:$0.5",
+  );
+  console.log("  snackmoney batch-send farcaster.xyz/toly:50¢,mesut:25¢");
+  console.log("  snackmoney batch-send ./payments.json");
+  console.log("  snackmoney batch-send https://example.com/payments.json");
   process.exit(0);
 }
 
 if (args._.length === 0) {
-  console.error("Usage: snackmoney batch-pay <input> [--network <base|solana>]");
+  console.error(
+    "Usage: snackmoney batch-send <input> [--network <base|solana>]",
+  );
   console.error("\nInput formats:");
   console.error("  1. Comma-separated: x/jessepollak:1¢,aeyakovenko:$0.5");
-  console.error("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"jessepollak\",\"amount\":\"1¢\"}]}'");
+  console.error(
+    '  2. JSON string: \'{"platform":"x","payments":[{"receiver":"jessepollak","amount":"1¢"}]}\'',
+  );
   console.error("  3. File path: ./payments.json or file:./payments.json");
   console.error("  4. HTTP URL: https://example.com/payments.json");
   console.error("\nExamples:");
-  console.error("  snackmoney batch-pay x/jessepollak:1¢,aeyakovenko:$0.5");
-  console.error("  snackmoney batch-pay x.com/jessepollak:1¢,0xmesuthere:$0.5");
-  console.error("  snackmoney batch-pay twitter.com/jessepollak:1¢,aeyakovenko:$0.5");
-  console.error("  snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢");
-  console.error("  snackmoney batch-pay ./payments.json");
-  console.error("  snackmoney batch-pay https://example.com/payments.json");
+  console.error("  snackmoney batch-send x/jessepollak:1¢,aeyakovenko:$0.5");
+  console.error(
+    "  snackmoney batch-send x.com/jessepollak:1¢,0xmesuthere:$0.5",
+  );
+  console.error(
+    "  snackmoney batch-send twitter.com/jessepollak:1¢,aeyakovenko:$0.5",
+  );
+  console.error("  snackmoney batch-send farcaster.xyz/toly:50¢,mesut:25¢");
+  console.error("  snackmoney batch-send ./payments.json");
+  console.error("  snackmoney batch-send https://example.com/payments.json");
   process.exit(1);
 }
 
+/**
+ *
+ */
 async function parseInput(): Promise<void> {
   try {
     const input = args._[0];
 
     let platform: string;
-    let payments: Array<{receiver: string, amount: number}>;
+    let payments: Array<{ receiver: string; amount: number }>;
 
     // Check input type
-    if (input.startsWith('http://') || input.startsWith('https://')) {
+    if (input.startsWith("http://") || input.startsWith("https://")) {
       // HTTP/HTTPS URL
       const data = await loadFromURL(input);
       const parsed = parseJSONPayments(data);
       platform = parsed.platform;
       payments = parsed.payments;
-    } else if (input.startsWith('file:') || input.endsWith('.json')) {
+    } else if (input.startsWith("file:") || input.endsWith(".json")) {
       // File path
       const data = await loadFromFile(input);
       const parsed = parseJSONPayments(data);
       platform = parsed.platform;
       payments = parsed.payments;
-    } else if (input.startsWith('{')) {
+    } else if (input.startsWith("{")) {
       // JSON string
       const data = JSON.parse(input);
       const parsed = parseJSONPayments(data);
@@ -336,10 +400,14 @@ async function parseInput(): Promise<void> {
     receivers = payments;
   } catch (error: any) {
     console.error(`❌ ${error.message}`);
-    console.error("\nUsage: snackmoney batch-pay <input> [--network <base|solana>]");
+    console.error(
+      "\nUsage: snackmoney batch-send <input> [--network <base|solana>]",
+    );
     console.error("\nInput formats:");
     console.error("  1. Comma-separated: x/jessepollak:1¢,aeyakovenko:$0.5");
-    console.error("  2. JSON string: '{\"platform\":\"x\",\"payments\":[{\"receiver\":\"jessepollak\",\"amount\":\"1¢\"}]}'");
+    console.error(
+      '  2. JSON string: \'{"platform":"x","payments":[{"receiver":"jessepollak","amount":"1¢"}]}\'',
+    );
     console.error("  3. File path: ./payments.json or file:./payments.json");
     console.error("  4. HTTP URL: https://example.com/payments.json");
     process.exit(1);
@@ -347,6 +415,9 @@ async function parseInput(): Promise<void> {
 }
 
 // Initialization function
+/**
+ *
+ */
 async function init(): Promise<void> {
   // Parse input (async)
   await parseInput();
@@ -354,7 +425,9 @@ async function init(): Promise<void> {
   // Input validations
   const allowedIdentities = ["x", "farcaster", "web", "email", "github"];
   if (!allowedIdentities.includes(receiverIdentity)) {
-    console.error(`❌ Platform must be one of: ${allowedIdentities.join(", ")}`);
+    console.error(
+      `❌ Platform must be one of: ${allowedIdentities.join(", ")}`,
+    );
     console.error(`   Got: ${receiverIdentity}`);
     console.error(`   Tip: Use 'twitter' or 'x' for X/Twitter payments`);
     process.exit(1);
@@ -371,7 +444,9 @@ async function init(): Promise<void> {
   if (args.network) {
     // Network explicitly specified
     if (!allowedNetworks.includes(args.network.toLowerCase())) {
-      console.error(`network must be either ${allowedNetworks.map(n => `'${n}'`).join(" or ")}`);
+      console.error(
+        `network must be either ${allowedNetworks.map((n) => `'${n}'`).join(" or ")}`,
+      );
       process.exit(1);
     }
 
@@ -379,28 +454,40 @@ async function init(): Promise<void> {
 
     // Validate the required key is available for the specified network
     if (useSolana && !hasSvmKey) {
-      console.error("❌ Missing SVM_PRIVATE_KEY environment variable (needed for --network solana)");
+      console.error(
+        "❌ Missing SVM_PRIVATE_KEY environment variable (needed for --network solana)",
+      );
       process.exit(1);
     }
     if (!useSolana && !hasEvmKey) {
-      console.error("❌ Missing EVM_PRIVATE_KEY environment variable (needed for --network base)");
+      console.error(
+        "❌ Missing EVM_PRIVATE_KEY environment variable (needed for --network base)",
+      );
       process.exit(1);
     }
   } else {
     // No network specified, auto-detect from available keys
     if (hasEvmKey && hasSvmKey) {
-      console.error("❌ Both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY environment variables are set");
-      console.error("   Please specify which network to use with --network <base|solana>");
+      console.error(
+        "❌ Both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY environment variables are set",
+      );
+      console.error(
+        "   Please specify which network to use with --network <base|solana>",
+      );
       process.exit(1);
     } else if (hasSvmKey) {
       useSolana = true;
-      console.log("ℹ️  Auto-detected network: Solana (based on SVM_PRIVATE_KEY)");
+      console.log(
+        "ℹ️  Auto-detected network: Solana (based on SVM_PRIVATE_KEY)",
+      );
     } else if (hasEvmKey) {
       useSolana = false;
       console.log("ℹ️  Auto-detected network: Base (based on EVM_PRIVATE_KEY)");
     } else {
       console.error("❌ No private keys found in environment variables");
-      console.error("   Set either EVM_PRIVATE_KEY (for Base) or SVM_PRIVATE_KEY (for Solana)");
+      console.error(
+        "   Set either EVM_PRIVATE_KEY (for Base) or SVM_PRIVATE_KEY (for Solana)",
+      );
       process.exit(1);
     }
   }
@@ -415,45 +502,48 @@ async function main(): Promise<void> {
 
   if (useSolana) {
     console.log("\n🔧 Creating Solana signer...");
-    
+
     // Use mainnet for production, devnet for local development
-    network = baseURL?.includes('localhost') || baseURL?.includes('127.0.0.1')
-      ? "solana-devnet"
-      : "solana";
+    network =
+      baseURL?.includes("localhost") || baseURL?.includes("127.0.0.1")
+        ? "solana-devnet"
+        : "solana";
 
     const signer = await createSigner(network, svmPrivateKey);
     console.log("✅ Solana signer created");
-    
-    api = withPaymentInterceptor(
-      axios.create({ baseURL }),
-      signer,
-    );
+
+    api = withPaymentInterceptor(axios.create({ baseURL }), signer);
   } else {
     console.log("\n🔧 Creating Base signer...");
     network = "base";
-    
+
     const account = privateKeyToAccount(privateKey);
     console.log("✅ Base signer created");
-    
-    api = withPaymentInterceptor(
-      axios.create({ baseURL }),
-      account as never,
-    );
+
+    api = withPaymentInterceptor(axios.create({ baseURL }), account as never);
   }
 
-  console.log(`\n💸 Sending batch payment to ${receivers.length} recipients on ${receiverIdentity}...`);
-  console.log(`   Using endpoint: ${baseURL}/payments/${receiverIdentity}/batch-pay`);
-  console.log(`   Network: ${useSolana ? (network === 'solana' ? 'Solana Mainnet' : 'Solana Devnet') : 'Base'}\n`);
+  console.log(
+    `\n💸 Sending batch payment to ${receivers.length} recipients on ${receiverIdentity}...`,
+  );
+  console.log(
+    `   Using endpoint: ${baseURL}/payments/${receiverIdentity}/batch-pay`,
+  );
+  console.log(
+    `   Network: ${useSolana ? (network === "solana" ? "Solana Mainnet" : "Solana Devnet") : "Base"}\n`,
+  );
 
   try {
-    const response = await api.post(`/payments/${receiverIdentity}/batch-pay`, { 
+    const response = await api.post(`/payments/${receiverIdentity}/batch-pay`, {
       currency: "USDC",
       type: "social-network",
       sender_username: "snackmoney-agent-x402",
       receivers,
     });
 
-    console.log(`✅ ${response.data?.msg || 'Batch payment sent'} | 👥 ${receivers.length} recipients`);
+    console.log(
+      `✅ ${response.data?.msg || "Batch payment sent"} | 👥 ${receivers.length} recipients`,
+    );
     if (response.data?.txn_id || response.data?.data?.txn_id) {
       const txnId = response.data?.txn_id || response.data?.data?.txn_id;
       console.log(`🔗 TXN: ${txnId}`);
@@ -463,15 +553,23 @@ async function main(): Promise<void> {
     if (response.data?.data && Array.isArray(response.data.data)) {
       console.log(`\n📄 Individual Receipts:`);
       response.data.data.forEach((receiptData: any, index: number) => {
-        const username = receiptData.username || receiptData.receiver || receivers[index].receiver;
+        const username =
+          receiptData.username ||
+          receiptData.receiver ||
+          receivers[index].receiver;
         const receipt = receiptData.receipt;
-        const status = receiptData.status ? ` (${receiptData.status})` : '';
+        const status = receiptData.status ? ` (${receiptData.status})` : "";
         console.log(`   ${index + 1}. ${username}: ${receipt}${status}`);
       });
-    } else if (response.data?.receipts && Array.isArray(response.data.receipts)) {
+    } else if (
+      response.data?.receipts &&
+      Array.isArray(response.data.receipts)
+    ) {
       console.log(`\n📄 Individual Receipts:`);
       response.data.receipts.forEach((receiptData: any, index: number) => {
-        console.log(`   ${index + 1}. ${receiptData.receiver || receivers[index].receiver}: ${receiptData.receipt || receiptData}`);
+        console.log(
+          `   ${index + 1}. ${receiptData.receiver || receivers[index].receiver}: ${receiptData.receipt || receiptData}`,
+        );
       });
     } else if (response.data?.receipt || response.data?.data?.receipt) {
       // Fallback to single receipt if no individual receipts
@@ -486,27 +584,33 @@ async function main(): Promise<void> {
       console.log("\n💳 Payment details:");
       console.log("   Network:", paymentResponse.network);
       console.log("   Transaction hash:", paymentResponse.transaction);
-      
+
       if (useSolana) {
         console.log("\n🔗 View on Solscan:");
-        const cluster = network === 'solana' ? '' : '?cluster=devnet';
-        console.log(`   https://solscan.io/tx/${paymentResponse.transaction}${cluster}`);
+        const cluster = network === "solana" ? "" : "?cluster=devnet";
+        console.log(
+          `   https://solscan.io/tx/${paymentResponse.transaction}${cluster}`,
+        );
       } else {
         console.log("\n🔗 View on Etherscan:");
-        console.log(`   https://etherscan.io/tx/${paymentResponse.transaction}`);
+        console.log(
+          `   https://etherscan.io/tx/${paymentResponse.transaction}`,
+        );
       }
     }
   } catch (error: any) {
-    console.log(`❌ ${error.response?.data?.msg || 'Batch payment failed'}`);
-    
+    console.log(`❌ ${error.response?.data?.msg || "Batch payment failed"}`);
+
     if (error.response) {
       console.error("   Status:", error.response.status);
-      
+
       // Show payment options if 402
       if (error.response.status === 402 && error.response.data.accepts) {
         console.log("\n💡 Available payment options:");
         error.response.data.accepts.forEach((accept: any, i: number) => {
-          console.log(`   ${i + 1}. ${accept.network} - Pay to: ${accept.payTo}`);
+          console.log(
+            `   ${i + 1}. ${accept.network} - Pay to: ${accept.payTo}`,
+          );
         });
       }
     } else {

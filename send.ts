@@ -17,6 +17,8 @@ const baseURL = process.env.RESOURCE_SERVER_URL || "https://api.snack.money";
  * - "50¢" -> 0.50
  * - "$0.5" or "$0.50" -> 0.50
  * - "0.5" -> 0.50
+ *
+ * @param amountStr
  */
 function parseAmount(amountStr: string): number {
   const trimmed = amountStr.trim();
@@ -32,7 +34,18 @@ function parseAmount(amountStr: string): number {
 
   // Handle dollar notation ($0.5 or $0.50)
   if (trimmed.startsWith("$")) {
-    const dollars = parseFloat(trimmed.slice(1));
+    const dollarPart = trimmed.slice(1);
+
+    // Check if it looks like a shell positional parameter ($1, $2, $10, etc.)
+    if (/^\d+$/.test(dollarPart)) {
+      const dollars = parseInt(dollarPart, 10);
+      const cents = dollars * 100;
+      throw new Error(
+        `Dollar amounts like $${dollars} can be interpreted as shell variables. Please use ${cents}¢ instead (or quote as '\\$${dollars}').`,
+      );
+    }
+
+    const dollars = parseFloat(dollarPart);
     if (isNaN(dollars)) {
       throw new Error(`Invalid dollar amount: ${amountStr}`);
     }
@@ -50,6 +63,8 @@ function parseAmount(amountStr: string): number {
 /**
  * Validate X/Twitter username
  * Rules: 1-15 characters, alphanumeric and underscores only
+ *
+ * @param username
  */
 function validateXUsername(username: string): void {
   if (!/^[a-zA-Z0-9_]{1,15}$/.test(username)) {
@@ -62,6 +77,8 @@ function validateXUsername(username: string): void {
 /**
  * Validate Farcaster username
  * Rules: 1-16 characters, alphanumeric, hyphens, and underscores, must start with alphanumeric
+ *
+ * @param username
  */
 function validateFarcasterUsername(username: string): void {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,15}$/.test(username)) {
@@ -74,6 +91,8 @@ function validateFarcasterUsername(username: string): void {
 /**
  * Validate GitHub username
  * Rules: 1-39 characters, alphanumeric and hyphens, cannot start/end with hyphen, no consecutive hyphens
+ *
+ * @param username
  */
 function validateGitHubUsername(username: string): void {
   if (
@@ -88,6 +107,8 @@ function validateGitHubUsername(username: string): void {
 
 /**
  * Validate email address
+ *
+ * @param email
  */
 function validateEmail(email: string): void {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -99,6 +120,8 @@ function validateEmail(email: string): void {
 /**
  * Validate web domain
  * Rules: Valid domain name format
+ *
+ * @param domain
  */
 function validateWebDomain(domain: string): void {
   const domainRegex =
@@ -115,6 +138,8 @@ function validateWebDomain(domain: string): void {
  * - "x.com", "twitter.com", "twitter", "x" -> "x"
  * - "farcaster.xyz", "farcaster" -> "farcaster"
  * - "github.com", "github" -> "github"
+ *
+ * @param platform
  */
 function normalizePlatform(platform: string): string {
   const lower = platform.toLowerCase();
@@ -152,6 +177,8 @@ function normalizePlatform(platform: string): string {
  * - "github.com/user" -> { identity: "github", receiver: "user" }
  * - "email/user@example.com" -> { identity: "email", receiver: "user@example.com" }
  * - "web/snack.money" -> { identity: "web", receiver: "snack.money" }
+ *
+ * @param target
  */
 function parsePaymentTarget(target: string): {
   identity: string;
@@ -198,20 +225,23 @@ let amount: number;
 
 if (args._.length < 2) {
   console.error(
-    "Usage: snackmoney pay <platform/user> <amount> [--network <base|solana>]",
+    "Usage: snackmoney send <platform/user> <amount> [--network <base|solana>]",
   );
   console.error("\nExamples:");
-  console.error("  snackmoney pay x/jessepollak 1¢");
-  console.error("  snackmoney pay twitter/0xmesuthere $0.5");
-  console.error("  snackmoney pay farcaster/toly 50¢");
-  console.error("  snackmoney pay github/0xsnackbaker $1");
-  console.error("  snackmoney pay web/snack.money 0.01");
-  console.error("  snackmoney pay email/mesut@snack.money $0.25");
+  console.error("  snackmoney send x/jessepollak 1¢");
+  console.error("  snackmoney send twitter/0xmesuthere 50¢");
+  console.error("  snackmoney send farcaster/toly 100¢");
+  console.error("  snackmoney send github/0xsnackbaker 200¢");
+  console.error("  snackmoney send web/snack.money 0.01");
+  console.error("  snackmoney send email/mesut@snack.money 0.25");
   console.error(
-    "\nAmount formats: 1¢ (cents), $0.5 (dollars), or 0.5 (decimal)",
+    "\nAmount formats: 100¢ (cents - recommended), 0.5 (decimal), or '$0.5' (dollars - must be quoted)",
   );
   console.error(
-    "\nNote: If --network is not specified, it will be auto-detected based on available private keys.",
+    "\nNote: For whole dollar amounts, use cents (e.g., 100¢ instead of $1) to avoid shell variable conflicts.",
+  );
+  console.error(
+    "      If --network is not specified, it will be auto-detected based on available private keys.",
   );
   console.error(
     "      If both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY are set, you must specify --network.",
@@ -227,20 +257,23 @@ try {
 } catch (error: any) {
   console.error(`❌ ${error.message}`);
   console.error(
-    "\nUsage: snackmoney pay <platform/user> <amount> [--network <base|solana>]",
+    "\nUsage: snackmoney send <platform/user> <amount> [--network <base|solana>]",
   );
   console.error("\nExamples:");
-  console.error("  snackmoney pay x/jessepollak 1¢");
-  console.error("  snackmoney pay twitter/0xmesuthere $0.5");
-  console.error("  snackmoney pay farcaster/toly 50¢");
-  console.error("  snackmoney pay github/0xsnackbaker $1");
-  console.error("  snackmoney pay web/snack.money 0.01");
-  console.error("  snackmoney pay email/mesut@snack.money $0.25");
+  console.error("  snackmoney send x/jessepollak 1¢");
+  console.error("  snackmoney send twitter/0xmesuthere 50¢");
+  console.error("  snackmoney send farcaster/toly 100¢");
+  console.error("  snackmoney send github/0xsnackbaker 200¢");
+  console.error("  snackmoney send web/snack.money 0.01");
+  console.error("  snackmoney send email/mesut@snack.money 0.25");
   console.error(
-    "\nAmount formats: 1¢ (cents), $0.5 (dollars), or 0.5 (decimal)",
+    "\nAmount formats: 100¢ (cents - recommended), 0.5 (decimal), or '$0.5' (dollars - must be quoted)",
   );
   console.error(
-    "\nNote: If --network is not specified, it will be auto-detected based on available private keys.",
+    "\nNote: For whole dollar amounts, use cents (e.g., 100¢ instead of $1) to avoid shell variable conflicts.",
+  );
+  console.error(
+    "      If --network is not specified, it will be auto-detected based on available private keys.",
   );
   console.error(
     "      If both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY are set, you must specify --network.",
