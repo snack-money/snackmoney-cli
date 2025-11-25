@@ -112,9 +112,9 @@ jobs:
           end
           EOF
           else
-            # Update existing formula
-            sed -i "s|url \"https://registry.npmjs.org/snackmoney/-/snackmoney-.*\.tgz\"|url \"https://registry.npmjs.org/snackmoney/-/snackmoney-${VERSION}.tgz\"|g" Formula/snackmoney.rb
-            sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|g" Formula/snackmoney.rb
+            # Update existing formula - properly escape dots in regex and match both scoped and unscoped packages
+            sed -i "s|url \"https://registry.npmjs.org/.*snackmoney.*\.tgz\"|url \"https://registry.npmjs.org/snackmoney/-/snackmoney-${VERSION}.tgz\"|g" Formula/snackmoney.rb
+            sed -i "s|sha256 \"[^\"]*\"|sha256 \"${SHA256}\"|g" Formula/snackmoney.rb
           fi
 
       - name: Commit and push
