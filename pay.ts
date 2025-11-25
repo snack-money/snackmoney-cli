@@ -32,7 +32,18 @@ function parseAmount(amountStr: string): number {
 
   // Handle dollar notation ($0.5 or $0.50)
   if (trimmed.startsWith("$")) {
-    const dollars = parseFloat(trimmed.slice(1));
+    const dollarPart = trimmed.slice(1);
+
+    // Check if it looks like a shell positional parameter ($1, $2, $10, etc.)
+    if (/^\d+$/.test(dollarPart)) {
+      const dollars = parseInt(dollarPart, 10);
+      const cents = dollars * 100;
+      throw new Error(
+        `Dollar amounts like $${dollars} can be interpreted as shell variables. Please use ${cents}¢ instead (or quote as '\\$${dollars}').`
+      );
+    }
+
+    const dollars = parseFloat(dollarPart);
     if (isNaN(dollars)) {
       throw new Error(`Invalid dollar amount: ${amountStr}`);
     }
@@ -202,16 +213,19 @@ if (args._.length < 2) {
   );
   console.error("\nExamples:");
   console.error("  snackmoney pay x/jessepollak 1¢");
-  console.error("  snackmoney pay twitter/0xmesuthere $0.5");
-  console.error("  snackmoney pay farcaster/toly 50¢");
-  console.error("  snackmoney pay github/0xsnackbaker $1");
+  console.error("  snackmoney pay twitter/0xmesuthere 50¢");
+  console.error("  snackmoney pay farcaster/toly 100¢");
+  console.error("  snackmoney pay github/0xsnackbaker 200¢");
   console.error("  snackmoney pay web/snack.money 0.01");
-  console.error("  snackmoney pay email/mesut@snack.money $0.25");
+  console.error("  snackmoney pay email/mesut@snack.money 0.25");
   console.error(
-    "\nAmount formats: 1¢ (cents), $0.5 (dollars), or 0.5 (decimal)",
+    "\nAmount formats: 100¢ (cents - recommended), 0.5 (decimal), or '$0.5' (dollars - must be quoted)",
   );
   console.error(
-    "\nNote: If --network is not specified, it will be auto-detected based on available private keys.",
+    "\nNote: For whole dollar amounts, use cents (e.g., 100¢ instead of $1) to avoid shell variable conflicts.",
+  );
+  console.error(
+    "      If --network is not specified, it will be auto-detected based on available private keys.",
   );
   console.error(
     "      If both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY are set, you must specify --network.",
@@ -231,16 +245,19 @@ try {
   );
   console.error("\nExamples:");
   console.error("  snackmoney pay x/jessepollak 1¢");
-  console.error("  snackmoney pay twitter/0xmesuthere $0.5");
-  console.error("  snackmoney pay farcaster/toly 50¢");
-  console.error("  snackmoney pay github/0xsnackbaker $1");
+  console.error("  snackmoney pay twitter/0xmesuthere 50¢");
+  console.error("  snackmoney pay farcaster/toly 100¢");
+  console.error("  snackmoney pay github/0xsnackbaker 200¢");
   console.error("  snackmoney pay web/snack.money 0.01");
-  console.error("  snackmoney pay email/mesut@snack.money $0.25");
+  console.error("  snackmoney pay email/mesut@snack.money 0.25");
   console.error(
-    "\nAmount formats: 1¢ (cents), $0.5 (dollars), or 0.5 (decimal)",
+    "\nAmount formats: 100¢ (cents - recommended), 0.5 (decimal), or '$0.5' (dollars - must be quoted)",
   );
   console.error(
-    "\nNote: If --network is not specified, it will be auto-detected based on available private keys.",
+    "\nNote: For whole dollar amounts, use cents (e.g., 100¢ instead of $1) to avoid shell variable conflicts.",
+  );
+  console.error(
+    "      If --network is not specified, it will be auto-detected based on available private keys.",
   );
   console.error(
     "      If both EVM_PRIVATE_KEY and SVM_PRIVATE_KEY are set, you must specify --network.",

@@ -174,9 +174,11 @@ function promptConfirmation(question: string): Promise<boolean> {
   });
 
   return new Promise((resolve) => {
-    rl.question(`${question} (y/n): `, (answer) => {
+    rl.question(`${question} (Y/n): `, (answer) => {
       rl.close();
-      resolve(answer.toLowerCase() === "y" || answer.toLowerCase() === "yes");
+      const trimmed = answer.trim().toLowerCase();
+      // Accept empty input (Enter key) as "yes" by default
+      resolve(trimmed === "" || trimmed === "y" || trimmed === "yes");
     });
   });
 }
