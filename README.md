@@ -44,42 +44,42 @@ brew install snackmoney
    On Solana:
 
    ```bash
-   npx snackmoney pay x/aeyakovenko 1¢
+   npx snackmoney send x/aeyakovenko 1¢
    ```
 
    On Base:
 
    ```bash
-   npx snackmoney pay x/jessepollak $0.5
+   npx snackmoney send x/jessepollak $0.5
    ```
 
 ## 📖 Commands
 
-### `pay` - Send Single Payment
+### `send` - Send Single Payment
 
 ```bash
-snackmoney pay <platform/username> <amount> [--network <base|solana>]
+snackmoney send <platform/username> <amount> [--network <base|solana>]
 ```
 
 **Examples:**
 
 ```bash
 # Send to X users
-snackmoney pay x/aeyakovenko 1¢
-snackmoney pay x.com/jessepollak $0.5
-snackmoney pay twitter.com/0xmesuthere 50¢
+snackmoney send x/aeyakovenko 1¢
+snackmoney send x.com/jessepollak $0.5
+snackmoney send twitter.com/0xmesuthere 50¢
 
 # Send to Farcaster user
-snackmoney pay farcaster.xyz/toly $1
+snackmoney send farcaster.xyz/toly $1
 
 # Send to GitHub user
-snackmoney pay github.com/0xsnackbaker 0.01
+snackmoney send github.com/0xsnackbaker 0.01
 
 # Send to email
-snackmoney pay email/mesut@snack.money $0.25
+snackmoney send email/mesut@snack.money $0.25
 
 # Send to web domain
-snackmoney pay web/snack.money 0.5
+snackmoney send web/snack.money 0.5
 ```
 
 **Supported platforms:**
@@ -96,49 +96,49 @@ snackmoney pay web/snack.money 0.5
 - `$0.5`, `$1` - Dollar notation
 - `0.5`, `0.01` - Decimal notation
 
-### `batch-pay` - Send Batch Payments
+### `batch-send` - Send Batch Payments
 
 Send payments to multiple users at once using comma-separated format, JSON file, or URL.
 
 **Format 1: Comma-separated**
 
 ```bash
-snackmoney batch-pay <platform/user1:amount1,user2:amount2,...> [--network <base|solana>]
+snackmoney batch-send <platform/user1:amount1,user2:amount2,...> [--network <base|solana>]
 ```
 
 **Examples:**
 
 ```bash
 # Solana
-snackmoney batch-pay x/aeyakovenko:7¢,0xMert_:3¢,0xmesuthere:5¢ --network solana
+snackmoney batch-send x/aeyakovenko:7¢,0xMert_:3¢,0xmesuthere:5¢ --network solana
 
 # Base
-snackmoney batch-pay x/MurrLincoln:2¢,kleffew94:9¢,jessepollak:4¢,0xmesuthere:6¢ --network base
+snackmoney batch-send x/MurrLincoln:2¢,kleffew94:9¢,jessepollak:4¢,0xmesuthere:6¢ --network base
 
 # With domain extensions
-snackmoney batch-pay twitter.com/user1:1¢,user2:$0.5
-snackmoney batch-pay farcaster.xyz/toly:50¢,mesut:25¢
+snackmoney batch-send twitter.com/user1:1¢,user2:$0.5
+snackmoney batch-send farcaster.xyz/toly:50¢,mesut:25¢
 ```
 
 **Format 2: From file**
 
 ```bash
-snackmoney batch-pay ./examples/payments-solana.json
-snackmoney batch-pay ./examples/payments-base.json
-snackmoney batch-pay file:./payments.json
+snackmoney batch-send ./examples/payments-solana.json
+snackmoney batch-send ./examples/payments-base.json
+snackmoney batch-send file:./payments.json
 ```
 
 **Format 3: From URL**
 
 ```bash
-snackmoney batch-pay https://example.com/payments.json
-snackmoney batch-pay http://localhost:3000/payments.json
+snackmoney batch-send https://example.com/payments.json
+snackmoney batch-send http://localhost:3000/payments.json
 ```
 
 **Format 4: JSON string**
 
 ```bash
-snackmoney batch-pay '{"platform":"x","payments":[{"receiver":"aeyakovenko","amount":"1¢"}]}'
+snackmoney batch-send '{"platform":"x","payments":[{"receiver":"aeyakovenko","amount":"1¢"}]}'
 ```
 
 **JSON file format:**
@@ -316,32 +316,32 @@ snackmoney ai-agent --prompt "Send 1 USDC to @mesut on Farcaster and 0.5 USDC to
 
 ```bash
 # X user on Solana
-yarn pay x/aeyakovenko 1¢ --network solana
+yarn send x/aeyakovenko 1¢ --network solana
 
 # X user on Base
-yarn pay x/jessepollak $0.5 --network base
+yarn send x/jessepollak $0.5 --network base
 
 # Farcaster user
-yarn pay farcaster.xyz/toly 0.01
+yarn send farcaster.xyz/toly 0.01
 
 # GitHub user
-yarn pay github.com/0xsnackbaker $1
+yarn send github.com/0xsnackbaker $1
 ```
 
 #### Batch Payments
 
 ```bash
 # Solana - Comma-separated
-yarn batch-pay x/aeyakovenko:7¢,0xMert_:3¢,0xmesuthere:5¢ --network solana
+yarn batch-send x/aeyakovenko:7¢,0xMert_:3¢,0xmesuthere:5¢ --network solana
 
 # Base - Comma-separated
-yarn batch-pay x/MurrLincoln:2¢,kleffew94:9¢,jessepollak:4¢,0xmesuthere:6¢ --network base
+yarn batch-send x/MurrLincoln:2¢,kleffew94:9¢,jessepollak:4¢,0xmesuthere:6¢ --network base
 
 # From file
-yarn batch-pay ./examples/payments-solana.json
+yarn batch-send ./examples/payments-solana.json
 
 # From URL
-yarn batch-pay https://example.com/payments.json
+yarn batch-send https://example.com/payments.json
 ```
 
 #### AI Agent

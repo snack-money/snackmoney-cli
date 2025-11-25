@@ -38,8 +38,8 @@
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "pay": "tsx pay.ts",
-    "batch-pay": "tsx batch_pay.ts",
+    "send": "tsx send.ts",
+    "batch-send": "tsx batch_send.ts",
     "ai-agent": "tsx ai-payment-agent.ts",
     "format": "prettier -c .prettierrc --write \"**/*.{ts,js,cjs,json,md}\"",
     "format:check": "prettier -c .prettierrc --check \"**/*.{ts,js,cjs,json,md}\"",
