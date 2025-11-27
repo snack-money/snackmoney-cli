@@ -1,6 +1,6 @@
 # 🍪 Snack Money CLI
 
-A command-line tool for sending USDC payments and creating cookie campaigns via the [**Snack Money API**](https://docs.snack.money/api-reference/introduction) to any **X**, **Github** or **Farcaster** user on **Solana** or **Base** — no wallet address required, thanks to the **x402 protocol**.
+A command-line tool for sending USDC payments via the [**Snack Money API**](https://docs.snack.money/api-reference/introduction) to any **X**, **Github** or **Farcaster** user on **Solana** or **Base** — no wallet address required, thanks to the **x402 protocol**.
 
 ## 📦 Installation
 
