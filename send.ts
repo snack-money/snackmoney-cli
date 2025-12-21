@@ -3,10 +3,14 @@ import axios from "axios";
 import { Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
-  withPaymentInterceptor,
-  decodeXPaymentResponse,
-  createSigner,
-} from "x402-axios";
+  x402Client,
+  wrapAxiosWithPayment,
+  decodePaymentResponseHeader,
+} from "@x402/axios";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
+import { registerExactSvmScheme } from "@x402/svm/exact/client";
+import { createKeyPairSignerFromBytes } from "@solana/kit";
+import bs58 from "bs58";
 
 const privateKey = process.env.EVM_PRIVATE_KEY as Hex;
 const svmPrivateKey = process.env.SVM_PRIVATE_KEY as string;
@@ -359,8 +363,10 @@ if (args.network) {
  * 4. Complete the payment and get the response
  */
 async function main(): Promise<void> {
-  let api;
   let network;
+
+  // Create x402 client
+  const client = new x402Client();
 
   if (useSolana) {
     console.log("\n🔧 Creating Solana signer...");
@@ -371,10 +377,11 @@ async function main(): Promise<void> {
         ? "solana-devnet"
         : "solana";
 
-    const signer = await createSigner(network, svmPrivateKey);
+    const privateKeyBytes = bs58.decode(svmPrivateKey);
+    const solanaSigner = await createKeyPairSignerFromBytes(privateKeyBytes);
     console.log("✅ Solana signer created");
 
-    api = withPaymentInterceptor(axios.create({ baseURL }), signer);
+    registerExactSvmScheme(client, { signer: solanaSigner });
   } else {
     console.log("\n🔧 Creating Base signer...");
     network = "base";
@@ -382,8 +389,11 @@ async function main(): Promise<void> {
     const account = privateKeyToAccount(privateKey);
     console.log("✅ Base signer created");
 
-    api = withPaymentInterceptor(axios.create({ baseURL }), account as never);
+    registerExactEvmScheme(client, { signer: account });
   }
+
+  // Wrap axios with payment interceptor
+  const api = wrapAxiosWithPayment(axios.create({ baseURL }), client);
 
   console.log(
     `\n💸 Sending payment to ${receiverIdentity}:${receiver} (${amount} USDC)...`,
@@ -412,9 +422,9 @@ async function main(): Promise<void> {
     }
 
     // Show fee from payment response header (priority)
-    const paymentResponseHeader = response.headers["x-payment-response"];
+    const paymentResponseHeader = response.headers["payment-response"];
     if (paymentResponseHeader) {
-      const paymentResponse = decodeXPaymentResponse(paymentResponseHeader);
+      const paymentResponse = decodePaymentResponseHeader(paymentResponseHeader);
       console.log(`� Fee: Network fee paid on ${paymentResponse.network}`);
     }
 

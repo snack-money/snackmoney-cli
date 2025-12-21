@@ -3,10 +3,14 @@ import axios from "axios";
 import { Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
-  withPaymentInterceptor,
-  decodeXPaymentResponse,
-  createSigner,
-} from "x402-axios";
+  x402Client,
+  wrapAxiosWithPayment,
+  decodePaymentResponseHeader,
+} from "@x402/axios";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
+import { registerExactSvmScheme } from "@x402/svm/exact/client";
+import { createKeyPairSignerFromBytes } from "@solana/kit";
+import bs58 from "bs58";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
@@ -500,6 +504,9 @@ async function main(): Promise<void> {
   let api;
   let network;
 
+  // Create x402 client
+  const client = new x402Client();
+
   if (useSolana) {
     console.log("\n🔧 Creating Solana signer...");
 
@@ -509,10 +516,11 @@ async function main(): Promise<void> {
         ? "solana-devnet"
         : "solana";
 
-    const signer = await createSigner(network, svmPrivateKey);
+    const privateKeyBytes = bs58.decode(svmPrivateKey);
+    const solanaSigner = await createKeyPairSignerFromBytes(privateKeyBytes);
     console.log("✅ Solana signer created");
 
-    api = withPaymentInterceptor(axios.create({ baseURL }), signer);
+    registerExactSvmScheme(client, { signer: solanaSigner });
   } else {
     console.log("\n🔧 Creating Base signer...");
     network = "base";
@@ -520,8 +528,11 @@ async function main(): Promise<void> {
     const account = privateKeyToAccount(privateKey);
     console.log("✅ Base signer created");
 
-    api = withPaymentInterceptor(axios.create({ baseURL }), account as never);
+    registerExactEvmScheme(client, { signer: account });
   }
+
+  // Wrap axios with payment interceptor
+  api = wrapAxiosWithPayment(axios.create({ baseURL }), client);
 
   console.log(
     `\n💸 Sending batch payment to ${receivers.length} recipients on ${receiverIdentity}...`,
@@ -577,10 +588,10 @@ async function main(): Promise<void> {
       console.log(`📄 Receipt: ${receipt}`);
     }
 
-    // Decode payment response to see transaction details
-    const paymentResponseHeader = response.headers["x-payment-response"];
+    // Decode payment response to see transaction details (v2 uses payment-response)
+    const paymentResponseHeader = response.headers["payment-response"];
     if (paymentResponseHeader) {
-      const paymentResponse = decodeXPaymentResponse(paymentResponseHeader);
+      const paymentResponse = decodePaymentResponseHeader(paymentResponseHeader);
       console.log("\n💳 Payment details:");
       console.log("   Network:", paymentResponse.network);
       console.log("   Transaction hash:", paymentResponse.transaction);
