@@ -15,7 +15,15 @@ import minimist from "minimist";
 import axios from "axios";
 import { Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { withPaymentInterceptor, createSigner } from "x402-axios";
+import {
+  x402Client,
+  wrapAxiosWithPayment,
+  decodePaymentResponseHeader,
+} from "@x402/axios";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
+import { registerExactSvmScheme } from "@x402/svm/exact/client";
+import { createKeyPairSignerFromBytes } from "@solana/kit";
+import bs58 from "bs58";
 
 const privateKey = process.env.EVM_PRIVATE_KEY as Hex;
 const svmPrivateKey = process.env.SVM_PRIVATE_KEY as string;
@@ -131,6 +139,7 @@ interface PaymentInstruction {
 async function executePayment(instruction: PaymentInstruction): Promise<any> {
   let api;
   let network;
+  const client = new x402Client();
 
   if (useSolana) {
     // Use mainnet for production, devnet for local development
@@ -139,12 +148,15 @@ async function executePayment(instruction: PaymentInstruction): Promise<any> {
         ? "solana-devnet"
         : "solana";
 
-    const signer = await createSigner(network, svmPrivateKey);
-    api = withPaymentInterceptor(axios.create({ baseURL }), signer);
+    const privateKeyBytes = bs58.decode(svmPrivateKey);
+    const solanaSigner = await createKeyPairSignerFromBytes(privateKeyBytes);
+    registerExactSvmScheme(client, { signer: solanaSigner });
+    api = wrapAxiosWithPayment(axios.create({ baseURL }), client);
   } else {
     network = "base";
     const account = privateKeyToAccount(privateKey);
-    api = withPaymentInterceptor(axios.create({ baseURL }), account as never);
+    registerExactEvmScheme(client, { signer: account });
+    api = wrapAxiosWithPayment(axios.create({ baseURL }), client);
   }
 
   console.log(
@@ -196,6 +208,7 @@ async function executeBatchPayment(
 ): Promise<any> {
   let api;
   let network;
+  const client = new x402Client();
 
   if (useSolana) {
     // Use mainnet for production, devnet for local development
@@ -204,12 +217,15 @@ async function executeBatchPayment(
         ? "solana-devnet"
         : "solana";
 
-    const signer = await createSigner(network, svmPrivateKey);
-    api = withPaymentInterceptor(axios.create({ baseURL }), signer);
+    const privateKeyBytes = bs58.decode(svmPrivateKey);
+    const solanaSigner = await createKeyPairSignerFromBytes(privateKeyBytes);
+    registerExactSvmScheme(client, { signer: solanaSigner });
+    api = wrapAxiosWithPayment(axios.create({ baseURL }), client);
   } else {
     network = "base";
     const account = privateKeyToAccount(privateKey);
-    api = withPaymentInterceptor(axios.create({ baseURL }), account as never);
+    registerExactEvmScheme(client, { signer: account });
+    api = wrapAxiosWithPayment(axios.create({ baseURL }), client);
   }
 
   console.log(
