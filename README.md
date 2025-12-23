@@ -1,6 +1,6 @@
 # 🍪 Snack Money CLI
 
-A command-line tool for sending USDC payments and creating cookie campaigns via the [**Snack Money API**](https://docs.snack.money/api-reference/introduction) to any **X**, **Github** or **Farcaster** user on **Solana** or **Base** — no wallet address required, thanks to the **x402 protocol**.
+A command-line tool for sending USDC payments via the [**Snack Money API**](https://docs.snack.money/api-reference/introduction) to any **X**, **Github** or **Farcaster** user on **Solana** or **Base** — no wallet address required, thanks to the **x402 protocol**.
 
 ## 📦 Installation
 
@@ -178,75 +178,6 @@ snackmoney ai-agent --prompt "Send 0.5 USDC to @0xmesuthere on X via Base"
 snackmoney ai-agent --prompt "Send 1 USDC to @toly on Farcaster and 0.5 USDC to @aeyakovenko on X via Solana"
 ```
 
-### `sponsor-a-cookie` - Create Cookie Campaigns
-
-Create cookie campaigns on X (Twitter) or Farcaster platforms. Campaigns distribute free "cookies" (USDC tokens) to users who interact with your campaign.
-
-```bash
-snackmoney sponsor-a-cookie <json-input> [--network <base|solana>]
-```
-
-**JSON Input Options:**
-
-- Local file: `./campaign.json`
-- URL: `https://example.com/campaign.json`
-- Inline JSON: `'{"platform":"x",...}'`
-
-**Required Fields:**
-
-| Field | Type | Requirements | Description |
-|-------|------|--------------|-------------|
-| `platform` | string | "x" or "farcaster" | Campaign platform |
-| `name` | string | 3-100 characters | Campaign name |
-| `description` | string | 10-500 characters | Campaign description |
-| `totalCookies` | number | 3-10 (integer) | Number of cookies to distribute |
-| `sponsor.name` | string | 1-100 characters | Sponsor name |
-| `sponsor.handle` | string | 1-50 characters | Sponsor handle (without @) |
-| `sponsor.url` | string | Valid URL (optional) | Sponsor website |
-
-**Examples:**
-
-```bash
-# From JSON file
-snackmoney sponsor-a-cookie ./campaign.json
-
-# From URL
-snackmoney sponsor-a-cookie https://example.com/campaign.json
-
-# Inline JSON
-snackmoney sponsor-a-cookie '{"platform":"x","name":"Free Cookies","description":"Send cookies to friends!","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
-```
-
-**JSON Format:**
-
-```json
-{
-  "platform": "x",
-  "name": "5 Free Cookies Campaign",
-  "description": "Send free cookies to your friends on X and build community!",
-  "totalCookies": 5,
-  "sponsor": {
-    "name": "Snack Money",
-    "handle": "snackmoneyapp",
-    "url": "https://snack.money"
-  }
-}
-```
-
-**Example Files:**
-
-- [`examples/campaign-x.json`](examples/campaign-x.json) - X/Twitter campaign
-- [`examples/campaign-farcaster.json`](examples/campaign-farcaster.json) - Farcaster campaign
-
-**How it works:**
-
-1. Parse and validate campaign data
-2. Calculate total cost (cookies × cookie value)
-3. Prompt for payment confirmation
-4. Process payment via x402 protocol
-5. Create campaign (queued or active)
-6. Return campaign details and detail page URL
-
 ## 🤖 AI Features (Optional)
 
 For natural language payments, set up an AI API key:
@@ -348,16 +279,6 @@ yarn batch-send https://example.com/payments.json
 
 ```bash
 yarn ai-agent --prompt "Send 1 USDC to @mesut on Farcaster and 0.5 USDC to @aeyakovenko on X"
-```
-
-#### Create Campaigns
-
-```bash
-# From file
-yarn tsx sponsor-a-cookie.ts ./examples/campaign-x.json
-
-# Inline JSON
-yarn tsx sponsor-a-cookie.ts '{"platform":"farcaster","name":"Test Campaign","description":"This is a test campaign","totalCookies":5,"sponsor":{"name":"Snack","handle":"snackmoney"}}'
 ```
 
 ## 📝 Notes
